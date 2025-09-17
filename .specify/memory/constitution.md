@@ -1,50 +1,40 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# Video Converter Android Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Component-Driven Development (NON-NEGOTIABLE)
+Every feature is implemented following atomic design principles with React Native components; Components must be self-contained, reusable, and follow single responsibility principle; Clear TypeScript interfaces required for all component props with comprehensive documentation; No inline styles - all styling through Tailwind CSS/NativeWind
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Maximum Productivity and TypeScript Excellence
+Development process focused on modern React Native patterns with TypeScript 5.0+ strict configuration; Functional programming approach with custom hooks for reusable logic; ES6+ features mandatory (destructuring, async/await, template literals); Zero `any` types allowed - strict type safety enforced
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Test-Coverage (NON-NEGOTIABLE)
+All features must be covered by Jest unit tests and React Native Testing Library component tests; Minimum 80% code coverage for utilities and services; TDD approach: Tests written → User approved → Tests fail → Then implement; Performance tests for video processing workflows mandatory
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Integration Testing
+Focus areas requiring integration tests: Video conversion end-to-end workflows, File system operations, Background processing, Component interaction patterns; Test with real video files and various Android devices; Create test dataset snapshots for repeatable testing
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Architecture & Performance Standards
+Follow atomic design folder structure (atoms/molecules/organisms/templates); FFmpeg Kit integration with chunked processing and memory management; Background processing with real-time progress tracking; App launch time < 2 seconds, memory usage < 200MB baseline
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Technology Stack & Design System
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### Required Technologies
+React Native 0.73+ with New Architecture (Fabric/TurboModules); TypeScript 5.0+ with strict configuration; NativeWind for Tailwind CSS styling; FFmpeg Kit React Native for video processing; React Navigation v6 with type-safe navigation; React Native File System (RNFS) for file operations
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### Design System Standards
+Color palette: Primary Blue #2f6690, Secondary Blue #3a7ca5, Light Gray #d9dcd6, Dark Blue #16425b, Light Blue #81c3d7; Typography scale with consistent font sizes and weights; 8px base spacing unit; Component variants standardized (size, color, state); WCAG 2.1 AA accessibility compliance
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Development Workflow & Quality Gates
+
+### Code Quality Requirements
+ESLint and Prettier configuration enforced; Husky git hooks for pre-commit quality gates; JSDoc comments for all functions and complex logic; Comprehensive README files for each major module; Architecture Decision Records (ADRs) for significant changes
+
+### Git Workflow & Versioning
+Semantic versioning (MAJOR.MINOR.PATCH); Branch strategy: main/develop/feature/hotfix/release; Pull request requirements: code review, automated testing, documentation updates; Manual testing on physical Android devices required
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+Constitution supersedes all other development practices; All PRs/reviews must verify compliance with component-driven development and TypeScript excellence; Complexity must be justified with performance implications documented; Security reviews required for video processing and file system changes; Amendments require team consensus, documentation, and migration plan
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: September 17, 2025 | **Last Amended**: September 17, 2025
