@@ -108,14 +108,16 @@ android {
     /**
      * Split APKs by architecture for smaller download sizes
      */
+    /*
     splits {
         abi {
             reset()
-            enable enableSeparateBuildPerCPUArchitecture
-            universalApk universalApk
+            enable true
+            universalApk false
             include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
         }
     }
+    */
     
     signingConfigs {
         debug {
@@ -155,8 +157,8 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             debuggable false
             
-            // Optional: Enable R8 full mode for better optimization
-            android.enableR8.fullMode = true
+            // Optional: Enable R8 full mode for better optimization (configured in gradle.properties)
+            // android.enableR8.fullMode = true
         }
     }
     
