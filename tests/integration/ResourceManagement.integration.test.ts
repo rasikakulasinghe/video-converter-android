@@ -10,31 +10,6 @@
 
 import { jest } from '@jest/globals';
 
-// Mock React Native modules
-jest.mock('react-native', () => ({
-  Platform: {
-    OS: 'android',
-    Version: 30,
-  },
-  DeviceEventEmitter: {
-    addListener: jest.fn(() => ({ remove: jest.fn() })),
-    removeAllListeners: jest.fn(),
-  },
-}));
-
-// Mock Device Info
-jest.mock('react-native-device-info', () => ({
-  getBatteryLevel: jest.fn(() => Promise.resolve(0.8)),
-  getPowerState: jest.fn(() => Promise.resolve({ 
-    batteryLevel: 0.8,
-    batteryState: 'unplugged',
-    lowPowerMode: false,
-  })),
-  getFreeDiskStorage: jest.fn(() => Promise.resolve(2147483648)), // 2GB
-  getTotalMemory: jest.fn(() => Promise.resolve(4294967296)), // 4GB
-  getUsedMemory: jest.fn(() => Promise.resolve(2147483648)), // 2GB used
-}));
-
 // Import services
 import { AndroidDeviceMonitor } from '../../src/services/implementations/AndroidDeviceMonitor';
 import { ThermalState } from '../../src/services/DeviceMonitorService';
