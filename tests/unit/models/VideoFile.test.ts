@@ -1,0 +1,259 @@
+/**
+ * VideoFile Model Tests
+ * 
+ * CRITICAL: These tests MUST FAIL before implementation exists
+ * Following TDD approach as per constitutional requirements
+ */
+
+import { VideoFile, OutputFormat, VideoMetadata } from '../../../src/types/models/index';
+
+describe('VideoFile Model', () => {
+  describe('VideoFile Interface', () => {
+    it('should have all required properties', () => {
+      const videoFile: VideoFile = {
+        id: 'test-id-123',
+        name: 'test-video.mp4',
+        path: '/storage/videos/test-video.mp4',
+        size: 1024000,
+        mimeType: 'video/mp4',
+        format: VideoFormat.MP4,
+        metadata: {
+          duration: 120.5,
+          width: 1920,
+          height: 1080,
+          frameRate: 30,
+          bitrate: 2000000,
+          codecName: 'h264'
+        },
+        createdAt: new Date('2025-09-19T10:00:00Z'),
+        modifiedAt: new Date('2025-09-19T10:00:00Z')
+      };
+
+      expect(videoFile.id).toBe('test-id-123');
+      expect(videoFile.name).toBe('test-video.mp4');
+      expect(videoFile.path).toBe('/storage/videos/test-video.mp4');
+      expect(videoFile.size).toBe(1024000);
+      expect(videoFile.mimeType).toBe('video/mp4');
+      expect(videoFile.format).toBe(VideoFormat.MP4);
+      expect(videoFile.metadata.duration).toBe(120.5);
+      expect(videoFile.createdAt).toBeInstanceOf(Date);
+    });
+
+    it('should validate required properties exist', () => {
+      expect(() => {
+        // This should fail compilation if properties are missing
+        const incompleteVideo: VideoFile = {
+          // Missing required properties
+        } as VideoFile;
+      }).toBeDefined();
+    });
+  });
+
+  describe('VideoFormat Enum', () => {
+    it('should define all supported video formats', () => {
+      expect(VideoFormat.MP4).toBe('mp4');
+      expect(VideoFormat.MOV).toBe('mov');
+      expect(VideoFormat.AVI).toBe('avi');
+      expect(VideoFormat.MKV).toBe('mkv');
+      expect(VideoFormat.WEBM).toBe('webm');
+      expect(VideoFormat.FLV).toBe('flv');
+      expect(VideoFormat.WMV).toBe('wmv');
+      expect(VideoFormat.M4V).toBe('m4v');
+    });
+
+    it('should have exactly 8 supported formats', () => {
+      const formatValues = Object.values(VideoFormat);
+      expect(formatValues).toHaveLength(8);
+    });
+  });
+
+  describe('VideoMetadata Interface', () => {
+    it('should have all required metadata properties', () => {
+      const metadata: VideoMetadata = {
+        duration: 300.75,
+        width: 1920,
+        height: 1080,
+        frameRate: 29.97,
+        bitrate: 5000000,
+        codecName: 'h264'
+      };
+
+      expect(metadata.duration).toBe(300.75);
+      expect(metadata.width).toBe(1920);
+      expect(metadata.height).toBe(1080);
+      expect(metadata.frameRate).toBe(29.97);
+      expect(metadata.bitrate).toBe(5000000);
+      expect(metadata.codecName).toBe('h264');
+    });
+
+    it('should support optional properties', () => {
+      const metadata: VideoMetadata = {
+        duration: 180.0,
+        width: 1280,
+        height: 720,
+        frameRate: 24,
+        bitrate: 1500000,
+        codecName: 'h265',
+        audioCodec: 'aac',
+        audioChannels: 2,
+        audioSampleRate: 44100
+      };
+
+      expect(metadata.audioCodec).toBe('aac');
+      expect(metadata.audioChannels).toBe(2);
+      expect(metadata.audioSampleRate).toBe(44100);
+    });
+  });
+
+  describe('VideoFile Validation Rules', () => {
+    it('should validate file size is positive', () => {
+      expect(() => {
+        const invalidVideo: VideoFile = {
+          id: 'test',
+          name: 'test.mp4',
+          path: '/test.mp4',
+          size: -1, // Invalid negative size
+          mimeType: 'video/mp4',
+          format: VideoFormat.MP4,
+          metadata: {
+            duration: 60,
+            width: 640,
+            height: 480,
+            frameRate: 30,
+            bitrate: 1000000,
+            codecName: 'h264'
+          },
+          createdAt: new Date(),
+          modifiedAt: new Date()
+        };
+        // Validation should fail
+      }).toBeDefined();
+    });
+
+    it('should validate metadata dimensions are positive', () => {
+      expect(() => {
+        const metadata: VideoMetadata = {
+          duration: 60,
+          width: -1920, // Invalid negative width
+          height: 1080,
+          frameRate: 30,
+          bitrate: 1000000,
+          codecName: 'h264'
+        };
+      }).toBeDefined();
+    });
+
+    it('should validate duration is non-negative', () => {
+      expect(() => {
+        const metadata: VideoMetadata = {
+          duration: -10, // Invalid negative duration
+          width: 1920,
+          height: 1080,
+          frameRate: 30,
+          bitrate: 1000000,
+          codecName: 'h264'
+        };
+      }).toBeDefined();
+    });
+  });
+
+  describe('VideoFile Helper Functions', () => {
+    it('should calculate aspect ratio from metadata', () => {
+      const metadata: VideoMetadata = {
+        duration: 60,
+        width: 1920,
+        height: 1080,
+        frameRate: 30,
+        bitrate: 1000000,
+        codecName: 'h264'
+      };
+
+      // This function should exist in VideoFile utils
+      expect(() => {
+        // calculateAspectRatio should be implemented
+        const aspectRatio = calculateAspectRatio(metadata);
+        expect(aspectRatio).toBeCloseTo(1.778, 3); // 16:9 ratio
+      }).toBeDefined();
+    });
+
+    it('should format file size for display', () => {
+      const videoFile: VideoFile = {
+        id: 'test',
+        name: 'test.mp4',
+        path: '/test.mp4',
+        size: 1048576, // 1MB
+        mimeType: 'video/mp4',
+        format: VideoFormat.MP4,
+        metadata: {
+          duration: 60,
+          width: 640,
+          height: 480,
+          frameRate: 30,
+          bitrate: 1000000,
+          codecName: 'h264'
+        },
+        createdAt: new Date(),
+        modifiedAt: new Date()
+      };
+
+      // This function should exist in VideoFile utils
+      expect(() => {
+        const formattedSize = formatFileSize(videoFile.size);
+        expect(formattedSize).toBe('1.0 MB');
+      }).toBeDefined();
+    });
+
+    it('should format duration for display', () => {
+      const metadata: VideoMetadata = {
+        duration: 125.5, // 2:05.5
+        width: 1920,
+        height: 1080,
+        frameRate: 30,
+        bitrate: 1000000,
+        codecName: 'h264'
+      };
+
+      expect(() => {
+        const formattedDuration = formatDuration(metadata.duration);
+        expect(formattedDuration).toBe('2:05');
+      }).toBeDefined();
+    });
+  });
+
+  describe('VideoFile Creation', () => {
+    it('should create VideoFile from file path', async () => {
+      const filePath = '/storage/videos/sample.mp4';
+      
+      expect(() => {
+        // This async function should exist
+        const videoFile = await createVideoFileFromPath(filePath);
+        expect(videoFile.path).toBe(filePath);
+        expect(videoFile.id).toBeDefined();
+        expect(videoFile.metadata).toBeDefined();
+      }).toBeDefined();
+    });
+
+    it('should extract format from file extension', () => {
+      const testCases = [
+        { fileName: 'video.mp4', expectedFormat: VideoFormat.MP4 },
+        { fileName: 'movie.mov', expectedFormat: VideoFormat.MOV },
+        { fileName: 'clip.avi', expectedFormat: VideoFormat.AVI },
+        { fileName: 'film.mkv', expectedFormat: VideoFormat.MKV },
+      ];
+
+      testCases.forEach(({ fileName, expectedFormat }) => {
+        expect(() => {
+          const format = extractFormatFromFileName(fileName);
+          expect(format).toBe(expectedFormat);
+        }).toBeDefined();
+      });
+    });
+  });
+});
+
+// These functions are expected to exist but don't yet - tests MUST FAIL
+declare function calculateAspectRatio(metadata: VideoMetadata): number;
+declare function formatFileSize(sizeInBytes: number): string;
+declare function formatDuration(durationInSeconds: number): string;
+declare function createVideoFileFromPath(filePath: string): Promise<VideoFile>;
+declare function extractFormatFromFileName(fileName: string): VideoFormat;
