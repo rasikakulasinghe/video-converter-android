@@ -11,7 +11,10 @@
       "Bash(npx expo start:*)",
       "Bash(expo doctor:*)",
       "Bash(npx expo:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(npm ls:*)",
+      "Bash(.gradlew:*)",
+      "Bash(npm test)"
     ],
     "deny": [],
     "ask": []

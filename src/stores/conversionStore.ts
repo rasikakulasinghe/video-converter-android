@@ -8,13 +8,14 @@ import {
   ConversionEventType,
   SessionState 
 } from '../services/VideoProcessorService';
-import { FFmpegVideoProcessor } from '../services/implementations/FFmpegVideoProcessor';
-import { 
-  VideoFile, 
-  ConversionRequest, 
+import { VideoProcessorFactory } from '../services/VideoProcessorFactory';
+import {
+  VideoFile,
+  ConversionRequest,
   ConversionResult,
   ConversionProgress,
-  ConversionStatus 
+  ConversionStatus,
+  ErrorSeverity
 } from '../types/models';
 import { ThermalState } from '../types/models/DeviceCapabilities';
 
@@ -30,6 +31,10 @@ interface UIConversionProgress extends ConversionProgress {
   bitrateString: string;
   /** Current file size in bytes */
   currentSize: number;
+  /** Progress percentage */
+  percentage: number;
+  /** Estimated time remaining */
+  estimatedTimeRemaining: number;
 }
 
 /**
@@ -189,7 +194,7 @@ export const useConversionStore = create<ConversionStore>()(
     autoStartQueue: false,
     notifyOnCompletion: true,
     deleteOriginalsAfterConversion: false,
-    videoProcessor: new FFmpegVideoProcessor(),
+    videoProcessor: VideoProcessorFactory.getInstance(),
 
     // Actions
     startConversion: async (request: ConversionRequest): Promise<string> => {
@@ -331,7 +336,8 @@ export const useConversionStore = create<ConversionStore>()(
             error: {
               code: finalSession.error.code,
               message: finalSession.error.message,
-              severity: 'critical',
+              severity: ErrorSeverity.CRITICAL,
+              timestamp: new Date(),
               ...(finalSession.error.details && { details: finalSession.error.details }),
             }
           } : {}),
@@ -616,10 +622,10 @@ export const useConversionStore = create<ConversionStore>()(
             newStats.averageProcessingTime = newStats.totalProcessingTime / newStats.completedJobs;
           }
           
-          // Update size statistics if available from stats
-          if (jobResult.stats) {
-            newStats.totalSizeProcessed += jobResult.stats.inputSize || 0;
-            newStats.totalSizeReduced += (jobResult.stats.inputSize || 0) - (jobResult.stats.outputSize || 0);
+          // Update size statistics if available from input/output files
+          if (jobResult.request?.inputFile && jobResult.outputFile) {
+            newStats.totalSizeProcessed += jobResult.request.inputFile.size || 0;
+            newStats.totalSizeReduced += (jobResult.request.inputFile.size || 0) - (jobResult.outputFile.size || 0);
           }
         } else {
           newStats.failedJobs += 1;

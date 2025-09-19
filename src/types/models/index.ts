@@ -40,6 +40,7 @@ export interface VideoMetadata {
   height: number;
   frameRate: number;
   bitrate: number;
+  codec: string;
   codecName: string;
   audioCodec?: string;
   audioBitrate?: number;
@@ -67,7 +68,20 @@ export interface ConversionSettings {
 }
 
 // Export all the main types
-export type { ConversionRequest, ConversionValidationResult, ConversionQualityPreset, ConversionOptions } from './ConversionRequest';
-export type { ConversionResult, ConversionResultValidationResult, ConversionError, ErrorSeverity } from './ConversionResult';
-export type { ConversionProgress } from './ConversionResult';
+export type {
+  ConversionRequest,
+  ConversionValidationResult,
+  ConversionQualityPreset,
+  ConversionOptions
+} from './ConversionRequest';
+
+export type {
+  ConversionResult,
+  ConversionResultValidationResult,
+  ConversionProgress,
+  ConversionError
+} from './ConversionResult';
+
+export { ErrorSeverity } from './ConversionResult';
+
 export type { VideoValidationResult } from './VideoFile';

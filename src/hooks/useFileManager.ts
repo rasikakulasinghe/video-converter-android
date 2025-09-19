@@ -8,7 +8,7 @@ import { Alert } from 'react-native';
 import { launchImageLibrary, MediaType, ImagePickerResponse } from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
 
-import type { VideoFile } from '../types/models';
+import { VideoFile, VideoFormat } from '../types/models';
 
 /**
  * File manager hook return type
@@ -66,7 +66,9 @@ export const useFileManager = (): UseFileManagerReturn => {
                   path: asset.uri,
                   size: asset.fileSize,
                   mimeType: asset.type || 'video/mp4',
+                  format: VideoFormat.MP4, // Default format
                   createdAt: new Date(),
+                  modifiedAt: new Date(),
                   metadata: {
                     duration: (asset.duration || 0) * 1000, // Convert to milliseconds
                     width: asset.width || 0,
@@ -74,6 +76,7 @@ export const useFileManager = (): UseFileManagerReturn => {
                     frameRate: 30, // Default value
                     bitrate: 0, // Unknown at selection
                     codec: 'unknown',
+                    codecName: 'unknown',
                   },
                 });
               }
@@ -122,7 +125,9 @@ export const useFileManager = (): UseFileManagerReturn => {
         path: filePath,
         size: stats.size,
         mimeType: 'video/mp4', // Default, would need proper detection
+        format: VideoFormat.MP4, // Default format
         createdAt: new Date(stats.ctime),
+        modifiedAt: new Date(stats.mtime),
         metadata: {
           duration: 0, // Would need video metadata extraction
           width: 0,
@@ -130,6 +135,7 @@ export const useFileManager = (): UseFileManagerReturn => {
           frameRate: 30,
           bitrate: 0,
           codec: 'unknown',
+          codecName: 'unknown',
         },
       };
     } catch (error) {

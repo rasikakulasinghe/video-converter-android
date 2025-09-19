@@ -18,7 +18,7 @@ import {
   ConversionEventType,
   FFmpegCommand,
 } from '../VideoProcessorService';
-import { VideoFile, ConversionRequest, ConversionResult, VideoQuality, OutputFormat, ConversionStatus, ConversionProgress } from '../../types/models';
+import { VideoFile, ConversionRequest, ConversionResult, VideoQuality, OutputFormat, ConversionStatus, ConversionProgress, VideoFormat } from '../../types/models';
 import { DeviceCapabilities, ThermalState } from '../../types/models/DeviceCapabilities';
 
 /**
@@ -60,7 +60,7 @@ export class FFmpegVideoProcessor implements VideoProcessorService {
       const session = await FFmpegKit.execute(command);
       const returnCode = await session.getReturnCode();
 
-      if (!ReturnCode.isSuccess(returnCode)) {
+      if (!returnCode.isValueSuccess()) {
         return {
           isValid: false,
           metadata: null,
@@ -200,9 +200,9 @@ export class FFmpegVideoProcessor implements VideoProcessorService {
       // Execute FFmpeg with progress tracking
       const ffmpegSession = await FFmpegKit.executeAsync(
         command.arguments.join(' '),
-        (completedSession) => this.handleSessionCompletion(sessionId, completedSession),
-        (log) => this.handleLogMessage(sessionId, log),
-        (statistics) => this.handleStatistics(sessionId, statistics)
+        (completedSession: any) => this.handleSessionCompletion(sessionId, completedSession),
+        (log: any) => this.handleLogMessage(sessionId, log),
+        (statistics: any) => this.handleStatistics(sessionId, statistics)
       );
 
       this.activeSessions.set(sessionId, ffmpegSession);
@@ -688,7 +688,7 @@ export class FFmpegVideoProcessor implements VideoProcessorService {
 
     const returnCode = await ffmpegSession.getReturnCode();
     
-    if (ReturnCode.isSuccess(returnCode)) {
+    if (returnCode.isValueSuccess()) {
       session.state = SessionState.COMPLETED;
       session.completedAt = new Date();
       session.progress.percentage = 100;
@@ -714,8 +714,14 @@ export class FFmpegVideoProcessor implements VideoProcessorService {
           startTime: session.statistics.startTime,
           endTime: new Date(),
           outputFile: {
+            id: `output_${session.id}`,
+            name: session.request.outputPath.split('/').pop() || 'converted_video.mp4',
             path: session.request.outputPath,
             size: Number(outputStats.size),
+            mimeType: 'video/mp4',
+            format: VideoFormat.MP4,
+            createdAt: new Date(),
+            modifiedAt: new Date(),
             metadata: {
               duration: session.request.inputFile.metadata.duration,
               width: 0, // Will be filled by actual analysis
@@ -723,6 +729,7 @@ export class FFmpegVideoProcessor implements VideoProcessorService {
               frameRate: session.request.inputFile.metadata.frameRate,
               bitrate: session.request.inputFile.metadata.bitrate,
               codec: 'h264', // Default for converted files
+              codecName: 'H.264', // Default codec name for converted files
             },
           },
         };

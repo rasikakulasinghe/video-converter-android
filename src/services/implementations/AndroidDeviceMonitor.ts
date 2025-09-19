@@ -665,8 +665,12 @@ export class AndroidDeviceMonitor implements DeviceMonitorService {
           // Old API, store reference for manual cleanup
           this.appStateSubscription = {
             remove: () => {
-              if (AppState.removeEventListener) {
-                AppState.removeEventListener('change', this.handleAppStateChange);
+              // Note: removeEventListener is deprecated, but some RN versions might still have it
+              // This is wrapped in try-catch to handle both old and new API versions
+              try {
+                (AppState as any).removeEventListener?.('change', this.handleAppStateChange);
+              } catch (error) {
+                console.warn('AppState removeEventListener not available:', error);
               }
             }
           };

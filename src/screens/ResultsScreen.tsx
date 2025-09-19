@@ -7,6 +7,7 @@ import { Text } from '../components/atoms/Text';
 import { FileCard } from '../components/molecules/FileCard';
 
 import type { RootStackParamList } from '../types/navigation';
+import { VideoFormat } from '../types/models';
 
 interface ResultsScreenProps {}
 
@@ -28,7 +29,9 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = () => {
       path: '/storage/processed/vacation_video.mp4',
       size: 25600000,
       mimeType: 'video/mp4',
+      format: VideoFormat.MP4,
       createdAt: new Date(),
+      modifiedAt: new Date(),
       metadata: {
         duration: 120000,
         width: 1920,
@@ -36,6 +39,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = () => {
         frameRate: 30,
         bitrate: 2500000,
         codec: 'h264',
+        codecName: 'h264',
       },
     },
     {
@@ -44,7 +48,9 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = () => {
       path: '/storage/processed/presentation.mp4',
       size: 15800000,
       mimeType: 'video/mp4',
+      format: VideoFormat.MP4,
       createdAt: new Date(Date.now() - 86400000), // 1 day ago
+      modifiedAt: new Date(Date.now() - 86400000),
       metadata: {
         duration: 300000,
         width: 1280,
@@ -52,6 +58,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = () => {
         frameRate: 24,
         bitrate: 1800000,
         codec: 'h264',
+        codecName: 'h264',
       },
     },
   ];

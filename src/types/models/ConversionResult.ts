@@ -1,11 +1,53 @@
-import { 
-  ConversionResult, 
-  ConversionResultValidationResult, 
-  ConversionProgress,
-  ConversionStatus,
-  ConversionError,
-  ErrorSeverity
-} from './index';
+import { ConversionStatus, VideoFile } from './index';
+import type { ConversionRequest } from './ConversionRequest';
+
+// Type definitions for this module
+export enum ErrorSeverity {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical',
+}
+
+export interface ConversionError {
+  code: string;
+  message: string;
+  severity: ErrorSeverity;
+  timestamp: Date;
+  stack?: string;
+}
+
+export interface ConversionProgress {
+  percentage: number;
+  currentFrame: number;
+  totalFrames: number;
+  processedDuration: number;
+  totalDuration: number;
+  estimatedTimeRemaining: number;
+  currentBitrate: number;
+  averageFps: number;
+}
+
+export interface ConversionResultValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+export interface ConversionResult {
+  id: string;
+  request: ConversionRequest;
+  status: ConversionStatus;
+  progress: ConversionProgress;
+  startTime: Date;
+  endTime?: Date;
+  outputFile?: VideoFile;
+  error?: ConversionError;
+  stats?: {
+    compressionRatio: number;
+    processingDuration: number;
+    averageSpeed: number;
+  };
+}
 
 /**
  * Validates a ConversionResult for correctness and compliance

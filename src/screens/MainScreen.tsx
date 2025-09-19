@@ -130,7 +130,6 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
                        settings.quality === 'medium' ? VideoQuality.HD : VideoQuality.FULL_HD,
         outputFormat: settings.format === 'mp4' ? OutputFormat.MP4 : OutputFormat.MP4,
         createdAt: new Date(),
-        priority: 'normal',
       };
       
       await startConversion(request);

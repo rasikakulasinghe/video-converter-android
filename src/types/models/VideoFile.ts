@@ -1,4 +1,10 @@
-import { VideoFile, VideoMetadata, VideoQuality, VideoValidationResult } from './index';
+import { VideoFile, VideoMetadata, VideoQuality } from './index';
+
+// Type definitions for this module
+export interface VideoValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
 
 // Constants for validation
 const MIN_FILE_SIZE = 1024; // 1KB

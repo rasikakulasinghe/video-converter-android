@@ -1,11 +1,47 @@
-import { 
-  ConversionRequest, 
-  ConversionValidationResult, 
-  ConversionQualityPreset, 
-  ConversionOptions,
-  VideoQuality,
-  OutputFormat
-} from './index';
+import { VideoQuality, OutputFormat, VideoFile } from './index';
+
+// Type definitions for this module
+export interface ConversionValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+export interface ConversionOptions {
+  preserveAudio?: boolean;
+  startTime?: number;
+  endTime?: number;
+  customBitrate?: number;
+  customFrameRate?: number;
+  cropParams?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+}
+
+export interface ConversionQualityPreset {
+  quality: VideoQuality;
+  targetBitrate: number;
+  targetFrameRate: number;
+  maxDimensions: { width: number; height: number };
+  audioSettings: {
+    codec: string;
+    bitrate: number;
+    sampleRate: number;
+    channels: number;
+  };
+}
+
+export interface ConversionRequest {
+  id: string;
+  inputFile: VideoFile;
+  outputPath: string;
+  outputFormat: OutputFormat;
+  targetQuality: VideoQuality;
+  options?: ConversionOptions;
+  createdAt: Date;
+}
 
 // Constants for validation
 const MIN_BITRATE = 64000; // 64 kbps minimum

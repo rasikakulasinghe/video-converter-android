@@ -6,13 +6,12 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Alert } from 'react-native';
 
-import type { 
-  VideoProcessorService, 
-  ConversionSession, 
-  SessionState,
+import type {
+  VideoProcessorService,
+  ConversionSession,
   ConversionEvent
 } from '../services/VideoProcessorService';
-import { ConversionEventType } from '../services/VideoProcessorService';
+import { ConversionEventType, SessionState } from '../services/VideoProcessorService';
 import { ThermalState } from '../types/models/DeviceCapabilities';
 import type { ConversionRequest, ConversionResult, VideoFile } from '../types/models';
 
@@ -258,7 +257,7 @@ export const useVideoProcessor = (
       const session = await serviceRef.current.getSessionStatus(sessionId);
       
       // Convert session to result if completed
-      if (session.state === 'completed' && session.result) {
+      if (session.state === SessionState.COMPLETED && session.result) {
         return session.result;
       }
       

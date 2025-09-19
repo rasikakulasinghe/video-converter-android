@@ -27,7 +27,7 @@ import {
   FileWatchEvent,
   FileWatcher,
 } from '../FileManagerService';
-import { VideoFile } from '../../types/models';
+import { VideoFile, VideoFormat } from '../../types/models';
 
 /**
  * React Native FS implementation of FileManagerService
@@ -49,19 +49,23 @@ export class ReactNativeFileManager implements FileManagerService {
   async getFileInfo(filePath: string): Promise<FileInfo> {
     try {
       const stat = await FileSystem.getInfoAsync(filePath);
-      
+
+      if (!stat.exists) {
+        throw new Error('File does not exist');
+      }
+
       return {
         name: this.getFileName(filePath),
         path: filePath,
-        size: stat.size,
+        size: (stat as any).size || 0,
         mimeType: this.getMimeTypeFromExtension(this.getFileExtension(filePath)),
-        isDirectory: stat.isDirectory(),
-        isFile: stat.isFile(),
+        isDirectory: stat.isDirectory || false,
+        isFile: !(stat.isDirectory || false),
         isReadable: true, // Assume readable if we can stat
         isWritable: this.isPathWritable(filePath),
-        createdAt: new Date(stat.ctime || Date.now()),
-        lastModified: new Date(stat.mtime || Date.now()),
-        lastAccessed: new Date(stat.mtime || Date.now()), // RNFS doesn't provide atime
+        createdAt: new Date((stat as any).modificationTime || Date.now()),
+        lastModified: new Date((stat as any).modificationTime || Date.now()),
+        lastAccessed: new Date((stat as any).modificationTime || Date.now()), // RNFS doesn't provide atime
         permissions: {
           read: true,
           write: this.isPathWritable(filePath),
@@ -663,7 +667,9 @@ export class ReactNativeFileManager implements FileManagerService {
           path: result.file.path,
           size: result.file.size,
           mimeType: result.file.mimeType,
+          format: VideoFormat.MP4, // Default format
           createdAt: result.file.createdAt,
+          modifiedAt: result.file.lastModified,
           metadata: {
             duration: 0, // Will be filled by video analysis
             width: 0,
@@ -671,6 +677,7 @@ export class ReactNativeFileManager implements FileManagerService {
             frameRate: 0,
             bitrate: 0,
             codec: 'unknown',
+            codecName: 'unknown',
           },
         };
 
