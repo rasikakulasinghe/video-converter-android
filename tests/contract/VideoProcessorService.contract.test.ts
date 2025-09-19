@@ -12,28 +12,41 @@ import { jest } from '@jest/globals';
 
 // Import service interface and implementation
 import { VideoProcessorService } from '../../src/services/VideoProcessorService';
-import { FFmpegVideoProcessor } from '../../src/services/implementations/FFmpegVideoProcessor';
+import { Media3VideoProcessor } from '../../src/services/implementations/Media3VideoProcessor';
 
 // Import types
 import type { ConversionRequest } from '../../src/types/models';
 import { VideoQuality, OutputFormat } from '../../src/types/models';
 
-// Mock external dependencies
-jest.mock('ffmpeg-kit-react-native', () => ({
-  FFmpegKit: {
-    execute: jest.fn().mockResolvedValue({
-      getReturnCode: () => ({ getValue: () => 0 }),
-      getOutput: () => 'frame=100 fps=30.0 q=28.0 size=1024kB time=00:00:03.33 bitrate=2511.4kbits/s speed=1.0x',
-    }),
-    executeAsync: jest.fn(),
-    cancel: jest.fn(),
-    listSessions: jest.fn(() => []),
+// Mock React Native modules for Media3
+jest.mock('react-native', () => ({
+  Platform: { OS: 'android' },
+  NativeModules: {
+    Media3VideoProcessor: {
+      convertVideo: jest.fn().mockResolvedValue('session_123'),
+      analyzeVideo: jest.fn().mockResolvedValue({
+        isValid: true,
+        metadata: { duration: 10000, width: 1920, height: 1080 },
+        supportedFormats: ['mp4'],
+        recommendedQuality: '720p',
+        estimatedProcessingTime: 5000
+      }),
+      cancelConversion: jest.fn().mockResolvedValue(true),
+      getCapabilities: jest.fn().mockResolvedValue({
+        supportedInputFormats: ['mp4', 'mov'],
+        supportedOutputFormats: ['mp4'],
+        supportsHardwareAcceleration: true,
+        maxConcurrentSessions: 2
+      }),
+      EVENT_CONVERSION_PROGRESS: 'conversionProgress',
+      EVENT_CONVERSION_COMPLETE: 'conversionComplete',
+      EVENT_CONVERSION_ERROR: 'conversionError'
+    }
   },
-  ReturnCode: {
-    SUCCESS: 0,
-    CANCEL: 255,
-    isSuccess: jest.fn((code) => code === 0),
-  },
+  NativeEventEmitter: jest.fn().mockImplementation(() => ({
+    addListener: jest.fn(),
+    removeAllListeners: jest.fn()
+  }))
 }));
 
 jest.mock('react-native-fs', () => ({
@@ -52,13 +65,13 @@ describe('VideoProcessorService Contract Tests', () => {
   let videoProcessor: VideoProcessorService;
 
   beforeEach(() => {
-    videoProcessor = new FFmpegVideoProcessor();
+    videoProcessor = new Media3VideoProcessor();
     jest.clearAllMocks();
   });
 
   describe('Interface Compliance', () => {
     it('should implement VideoProcessorService interface', () => {
-      expect(videoProcessor).toBeInstanceOf(FFmpegVideoProcessor);
+      expect(videoProcessor).toBeInstanceOf(Media3VideoProcessor);
       expect(videoProcessor).toBeDefined();
     });
 

@@ -1,6 +1,6 @@
 /**
  * @fileoverview VideoProcessorService interface and related types
- * Defines the contract for video processing operations using FFmpeg
+ * Defines the contract for video processing operations using Media3
  */
 
 import { ConversionRequest, ConversionResult, VideoFile, VideoQuality, OutputFormat } from '../types/models';
@@ -179,19 +179,6 @@ export interface ConversionEvent {
   data?: any;
 }
 
-/**
- * FFmpeg command configuration
- */
-export interface FFmpegCommand {
-  /** Input file path */
-  inputPath: string;
-  /** Output file path */
-  outputPath: string;
-  /** FFmpeg command arguments */
-  arguments: string[];
-  /** Expected processing time in milliseconds */
-  estimatedDuration: number;
-}
 
 /**
  * Video analysis result from file inspection
@@ -247,8 +234,8 @@ export interface ConversionPreset {
   quality: VideoQuality;
   /** Target format */
   format: OutputFormat;
-  /** FFmpeg arguments */
-  ffmpegArgs: string[];
+  /** Media3 processing arguments */
+  processingArgs: string[];
   /** Estimated speed multiplier */
   speedMultiplier: number;
   /** Required device capability score */

@@ -46,96 +46,7 @@ jest.mock('react-native-fs', () => ({
   default: {}
 }));
 
-// Mock FFmpeg Kit React Native - Inline to avoid circular dependency
-let pendingConversions: any[] = [];
-
-jest.mock('ffmpeg-kit-react-native', () => ({
-  FFmpegKit: {
-    execute: jest.fn().mockResolvedValue({
-      getReturnCode: () => Promise.resolve({ getValue: () => 0 }),
-      getState: () => Promise.resolve('completed'),
-      getDuration: () => Promise.resolve(30000),
-      getOutput: () => Promise.resolve('FFmpeg output'),
-      getFailStackTrace: () => Promise.resolve(''),
-    }),
-    executeAsync: jest.fn((command, completeCallback, logCallback, statisticsCallback) => {
-      // Create a session that can be controlled
-      const session = {
-        getReturnCode: () => Promise.resolve({ getValue: () => 0 }),
-        getState: () => Promise.resolve('running'),
-        cancel: jest.fn(() => {
-          session.getState = () => Promise.resolve('cancelled');
-          if (completeCallback) {
-            completeCallback(session);
-          }
-        }),
-      };
-
-      // Store pending conversion so tests can control completion
-      pendingConversions.push({ session, completeCallback, statisticsCallback });
-
-      // Simulate statistics updates
-      setTimeout(() => {
-        if (statisticsCallback) {
-          statisticsCallback({ 
-            getTime: () => 1000, 
-            getVideoFrameNumber: () => 100,
-            getSpeed: () => 1.0,
-            getSize: () => 1024 * 1024,
-            getBitrate: () => 1000000
-          });
-        }
-      }, 50);
-
-      return Promise.resolve(session);
-    }),
-    cancel: jest.fn().mockResolvedValue(undefined),
-    list: jest.fn().mockResolvedValue([]),
-  },
-  FFmpegKitConfig: {
-    enableLogCallback: jest.fn(),
-    enableStatisticsCallback: jest.fn(),
-    setLogLevel: jest.fn(),
-  },
-  ReturnCode: {
-    SUCCESS: { getValue: () => 0 },
-    CANCEL: { getValue: () => 255 },
-    isSuccess: (returnCode: any) => returnCode?.getValue() === 0,
-    isCancel: (returnCode: any) => returnCode?.getValue() === 255,
-  },
-  Level: {
-    AV_LOG_QUIET: 0,
-    AV_LOG_INFO: 32,
-    AV_LOG_ERROR: 16,
-  },
-  SessionState: {
-    CREATED: 'created',
-    RUNNING: 'running',
-    FAILED: 'failed',
-    COMPLETED: 'completed',
-  },
-  default: {},
-
-  // Expose helper for tests
-  __testHelpers: {
-    completePendingConversions: () => {
-      pendingConversions.forEach(({ session, completeCallback }) => {
-        session.getState = () => Promise.resolve('completed');
-        if (completeCallback) {
-          completeCallback(session);
-        }
-      });
-      pendingConversions = [];
-    },
-    cancelPendingConversions: () => {
-      pendingConversions.forEach(({ session, completeCallback }) => {
-        session.cancel();
-      });
-      pendingConversions = [];
-    },
-    getPendingConversionsCount: () => pendingConversions.length,
-  }
-}));// Mock react-native-device-info
+// Mock react-native-device-info
 jest.mock('react-native-device-info', () => {
   // Create mock functions that always resolve successfully
   const createSuccessMock = (value: any) => jest.fn().mockResolvedValue(value);
@@ -228,5 +139,29 @@ jest.mock('react-native-haptic-feedback', () => ({
   trigger: jest.fn(),
 }));
 
-// Silence the warning: Animated: `useNativeDriver` is not supported
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+// Mock expo modules that might cause issues
+jest.mock('expo-constants', () => ({
+  expoConfig: {},
+  installationId: 'mock-installation-id',
+  sessionId: 'mock-session-id',
+  platform: {
+    android: {
+      versionCode: 1,
+    },
+  },
+}));
+
+jest.mock('expo-device', () => ({
+  isDevice: true,
+  brand: 'Mock',
+  manufacturer: 'Mock',
+  modelName: 'Mock Device',
+  deviceYearClass: 2020,
+  totalMemory: 8000000000,
+  osName: 'Android',
+  osVersion: '11',
+  osBuildId: 'mock-build-id',
+  osInternalBuildId: 'mock-internal-build-id',
+  deviceName: 'Mock Device',
+  deviceType: 1,
+}));

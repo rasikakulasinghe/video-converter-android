@@ -14,7 +14,6 @@ import {
   ValidationResult,
   ConversionEvent,
   ConversionEventType,
-  FFmpegCommand,
 } from '../VideoProcessorService';
 import {
   VideoFile,
@@ -445,14 +444,6 @@ export class Media3VideoProcessor implements VideoProcessorService {
     );
   }
 
-  async executeCommand(command: FFmpegCommand): Promise<any> {
-    // Media3 doesn't use FFmpeg commands, so this is not applicable
-    throw new ProcessingError(
-      ProcessingErrorType.OPERATION_NOT_SUPPORTED,
-      'FFmpeg commands are not supported by Media3 implementation',
-      { command }
-    );
-  }
 
   // Event handlers
   private handleProgressEvent(event: Media3ProgressEvent): void {

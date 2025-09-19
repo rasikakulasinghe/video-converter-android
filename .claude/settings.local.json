@@ -14,7 +14,9 @@
       "Bash(cat:*)",
       "Bash(npm ls:*)",
       "Bash(.gradlew:*)",
-      "Bash(npm test)"
+      "Bash(npm test)",
+      "Bash(npm run android:*)",
+      "Bash(./gradlew:*)"
     ],
     "deny": [],
     "ask": []

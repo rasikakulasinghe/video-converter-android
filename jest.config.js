@@ -1,6 +1,12 @@
+// Get the jest-expo preset but override the setupFiles
+const jestExpoPreset = require('jest-expo/jest-preset');
+
 module.exports = {
-  preset: 'jest-expo',
+  ...jestExpoPreset,
   testEnvironment: 'jsdom',
+  setupFiles: [
+    '<rootDir>/tests/expo-setup.js',
+  ],
   setupFilesAfterEnv: [
     '<rootDir>/tests/setup.ts',
   ],
@@ -52,7 +58,8 @@ module.exports = {
     // Mock React Native components and dependencies for testing
     '^react-native$': '<rootDir>/tests/mocks/react-native.ts',
     '^react-native-fs$': '<rootDir>/tests/mocks/react-native-fs.ts',
-    '^ffmpeg-kit-react-native$': '<rootDir>/tests/mocks/ffmpeg-kit-react-native.ts',
+    // Mock problematic expo-modules-core entirely
+    '^expo-modules-core': '<rootDir>/tests/mocks/expo-modules-core.ts',
   },
   // Add clearMocks to reset all mocks between tests
   clearMocks: true,
@@ -60,5 +67,7 @@ module.exports = {
   resetModules: true,
   transformIgnorePatterns: [
     'node_modules/(?!(react-native|@react-native|@react-navigation|expo|expo-.*|@expo|@expo/.*|react-native-.*)/)',
+    // Exclude problematic expo-modules-core source files
+    'node_modules/expo-modules-core/src/web/',
   ],
 };
