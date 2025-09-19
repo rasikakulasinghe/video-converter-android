@@ -1,9 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Video Converter</string>
-    <string name="notification_channel_name">Video Conversion</string>
-    <string name="notification_channel_description">Background video conversion progress</string>
-    <string name="conversion_in_progress">Converting video...</string>
-    <string name="conversion_complete">Video conversion complete</string>
-    <string name="conversion_failed">Video conversion failed</string>
+    <string name="app_name">TempVideoConverter</string>
 </resources>
