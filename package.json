@@ -76,17 +76,19 @@
     "ts-jest": "^29.4.2",
     "typescript": "~5.9.2"
   },
-  "doctor": {
-    "reactNativeDirectoryCheck": {
-      "exclude": [
-        "ffmpeg-kit-react-native",
-        "react-native-fs",
-        "react-native-haptic-feedback",
-        "nativewind",
-        "clsx",
-        "zustand"
-      ],
-      "listUnknownPackages": false
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "ffmpeg-kit-react-native",
+          "react-native-fs",
+          "react-native-haptic-feedback",
+          "nativewind",
+          "clsx",
+          "zustand"
+        ],
+        "listUnknownPackages": false
+      }
     }
   },
   "engines": {

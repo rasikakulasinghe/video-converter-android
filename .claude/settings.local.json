@@ -8,7 +8,10 @@
       "Read(//d/Projects/Current Projects/**)",
       "Bash(npm install)",
       "Bash(npm install:*)",
-      "Bash(npx expo start:*)"
+      "Bash(npx expo start:*)",
+      "Bash(expo doctor:*)",
+      "Bash(npx expo:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
