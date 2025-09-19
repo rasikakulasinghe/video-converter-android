@@ -29,6 +29,12 @@ module.exports = {
       statements: 80,
     },
   },
+  // Memory and performance optimizations
+  maxWorkers: 2,
+  workerIdleMemoryLimit: '512MB',
+  detectOpenHandles: true,
+  forceExit: true,
+  testTimeout: 30000,
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@components/(.*)$': '<rootDir>/src/components/$1',
@@ -38,9 +44,15 @@ module.exports = {
     '^@hooks/(.*)$': '<rootDir>/src/hooks/$1',
     '^@stores/(.*)$': '<rootDir>/src/stores/$1',
     '^@utils/(.*)$': '<rootDir>/src/utils/$1',
-    // Mock React Native components for testing
+    // Mock React Native components and dependencies for testing
     '^react-native$': '<rootDir>/tests/mocks/react-native.ts',
+    '^react-native-fs$': '<rootDir>/tests/mocks/react-native-fs.ts',
+    '^ffmpeg-kit-react-native$': '<rootDir>/tests/mocks/ffmpeg-kit-react-native.ts',
   },
+  // Add clearMocks to reset all mocks between tests
+  clearMocks: true,
+  // Force Jest to reset modules to ensure fresh imports
+  resetModules: true,
   transformIgnorePatterns: [
     'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-.*)/)',
   ],

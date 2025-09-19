@@ -10,14 +10,14 @@ import type { DeviceCapabilities } from '../types/models/DeviceCapabilities';
  * Session states for tracking conversion progress
  */
 export enum SessionState {
-  CREATED = 'created',
-  VALIDATED = 'validated',
-  QUEUED = 'queued',
-  PROCESSING = 'processing',
-  PAUSED = 'paused',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-  CANCELLED = 'cancelled',
+  CREATED = 'CREATED',
+  VALIDATED = 'VALIDATED',
+  QUEUED = 'QUEUED',
+  PROCESSING = 'PROCESSING',
+  PAUSED = 'PAUSED',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
 }
 
 /**

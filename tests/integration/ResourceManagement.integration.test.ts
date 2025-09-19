@@ -47,6 +47,11 @@ describe('ResourceManagement Integration Tests', () => {
     jest.clearAllMocks();
   });
 
+  afterEach(async () => {
+    // Clean up any running monitoring intervals
+    await deviceMonitor.stopMonitoring();
+  });
+
   describe('Device Monitor Integration', () => {
     it('should successfully create and initialize device monitor', async () => {
       expect(deviceMonitor).toBeDefined();

@@ -147,6 +147,9 @@ interface ConversionActions {
   estimateQueueTime: () => number;
   exportJobHistory: () => string;
   clearHistory: () => void;
+  
+  // Store reset
+  reset: () => void;
 }
 
 /**
@@ -708,6 +711,36 @@ export const useConversionStore = create<ConversionStore>()(
 
     clearHistory: (): void => {
       set({ jobHistory: [] });
+    },
+
+    reset: (): void => {
+      const { videoProcessor } = get();
+      set({
+        currentJob: null,
+        jobHistory: [],
+        progress: null,
+        queue: [],
+        isQueueActive: false,
+        maxConcurrentJobs: 1,
+        isProcessing: false,
+        isPaused: false,
+        canProcess: true,
+        stats: {
+          totalJobs: 0,
+          completedJobs: 0,
+          failedJobs: 0,
+          totalProcessingTime: 0,
+          averageProcessingTime: 0,
+          totalFilesProcessed: 0,
+          totalSizeProcessed: 0,
+          totalSizeReduced: 0,
+          successRate: 0,
+        },
+        autoStartQueue: false,
+        notifyOnCompletion: true,
+        deleteOriginalsAfterConversion: false,
+        videoProcessor, // Keep the same instance
+      });
     },
   }))
 );

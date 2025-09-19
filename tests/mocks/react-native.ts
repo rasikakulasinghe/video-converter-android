@@ -39,6 +39,29 @@ export const Alert = {
   alert: jest.fn(),
 };
 
+// Mock Platform
+export const Platform = {
+  OS: 'android' as const,
+  Version: 33,
+  select: (options: any) => options.android || options.default,
+  isTV: false,
+  isPad: false,
+  constants: {},
+};
+
+// Mock AppState with proper cleanup
+export const AppState = {
+  currentState: 'active' as const,
+  addEventListener: jest.fn(() => {
+    // Return cleanup function
+    return {
+      remove: jest.fn(),
+    };
+  }),
+  removeEventListener: jest.fn(),
+  isAvailable: true,
+};
+
 // Mock StyleSheet
 export const StyleSheet = {
   create: (styles: any) => styles,

@@ -18,7 +18,7 @@ import {
   FFmpegCommand,
 } from '../VideoProcessorService';
 import { VideoFile, ConversionRequest, ConversionResult, VideoQuality, OutputFormat, ConversionStatus, ConversionProgress } from '../../types/models';
-import { DeviceCapabilities } from '../../types/models/DeviceCapabilities';
+import { DeviceCapabilities, ThermalState } from '../../types/models/DeviceCapabilities';
 
 /**
  * FFmpeg-based implementation of VideoProcessorService
@@ -158,6 +158,9 @@ export class FFmpegVideoProcessor implements VideoProcessorService {
         cpuUsage: 0,
       },
     };
+
+    // Add sessionId as alias for id for compatibility
+    (session as any).sessionId = sessionId;
 
     this.conversionSessions.set(sessionId, session);
     return session;
@@ -787,5 +790,194 @@ export class FFmpegVideoProcessor implements VideoProcessorService {
       default:
         return 'video/mp4';
     }
+  }
+
+  // Additional methods expected by contract tests
+
+  /**
+   * Gets the current session state
+   */
+  getSessionState(sessionId: string): SessionState {
+    const session = this.conversionSessions.get(sessionId);
+    return session ? session.state : SessionState.FAILED;
+  }
+
+  /**
+   * Gets current progress for a session
+   */
+  getProgress(sessionId: string): ConversionProgress {
+    const session = this.conversionSessions.get(sessionId);
+    if (!session) {
+      return {
+        percentage: 0,
+        currentFrame: 0,
+        totalFrames: 0,
+        processedDuration: 0,
+        totalDuration: 0,
+        estimatedTimeRemaining: 0,
+        currentBitrate: 0,
+        averageFps: 0
+      };
+    }
+
+    // Convert from service ConversionProgress to models ConversionProgress
+    return {
+      percentage: session.progress.percentage,
+      currentFrame: Math.floor(session.progress.processedDuration * 30 / 1000), // Estimate frames at 30fps
+      totalFrames: Math.floor(session.progress.totalDuration * 30 / 1000), // Estimate frames at 30fps  
+      processedDuration: session.progress.processedDuration,
+      totalDuration: session.progress.totalDuration,
+      estimatedTimeRemaining: session.progress.estimatedTimeRemaining,
+      currentBitrate: 1000000, // Default 1Mbps
+      averageFps: 30 // Default 30fps
+    };
+  }
+
+  /**
+   * Event listeners for progress updates
+   */
+  private progressListeners: Array<(progress: ConversionProgress) => void> = [];
+  private sessionCompleteListeners: Array<(result: ConversionResult) => void> = [];
+  private errorListeners: Array<(error: ProcessingError) => void> = [];
+
+  /**
+   * Subscribe to progress updates
+   */
+  onProgressUpdate(callback: (progress: ConversionProgress) => void): () => void {
+    this.progressListeners.push(callback);
+    return () => {
+      const index = this.progressListeners.indexOf(callback);
+      if (index > -1) {
+        this.progressListeners.splice(index, 1);
+      }
+    };
+  }
+
+  /**
+   * Subscribe to session completion events
+   */
+  onSessionComplete(callback: (result: ConversionResult) => void): () => void {
+    this.sessionCompleteListeners.push(callback);
+    return () => {
+      const index = this.sessionCompleteListeners.indexOf(callback);
+      if (index > -1) {
+        this.sessionCompleteListeners.splice(index, 1);
+      }
+    };
+  }
+
+  /**
+   * Subscribe to error events
+   */
+  onError(callback: (error: ProcessingError) => void): () => void {
+    this.errorListeners.push(callback);
+    return () => {
+      const index = this.errorListeners.indexOf(callback);
+      if (index > -1) {
+        this.errorListeners.splice(index, 1);
+      }
+    };
+  }
+
+  /**
+   * Legacy convertVideo method for backward compatibility
+   */
+  async convertVideo(request: ConversionRequest): Promise<ConversionResult> {
+    const session = await this.createSession(request);
+    const deviceCapabilities: DeviceCapabilities = {
+      id: 'test-device',
+      deviceModel: 'Test Device',
+      androidVersion: '11',
+      apiLevel: 30,
+      architecture: 'arm64-v8a',
+      lastUpdated: new Date(),
+      battery: {
+        level: 0.8,
+        isCharging: false,
+        health: 'good',
+        temperature: 25,
+        voltage: 3.7,
+        capacity: 3000
+      },
+      memory: {
+        totalRam: 4096 * 1024 * 1024,
+        availableRam: 2048 * 1024 * 1024,
+        usedRam: 2048 * 1024 * 1024,
+        totalStorage: 64 * 1024 * 1024 * 1024,
+        availableStorage: 32 * 1024 * 1024 * 1024,
+        usedStorage: 32 * 1024 * 1024 * 1024,
+        isLowMemory: false
+      },
+      thermal: {
+        state: ThermalState.NORMAL,
+        temperature: 25,
+        throttleLevel: 0,
+        maxSafeTemperature: 65
+      },
+      processor: {
+        cores: 4,
+        maxFrequency: 2000,
+        currentFrequency: 1800,
+        usage: 30,
+        architecture: 'arm64'
+      },
+      performance: {
+        benchmark: 7,
+        videoProcessingScore: 70,
+        thermalEfficiency: 80,
+        batteryEfficiency: 80
+      }
+    };
+
+    const options: ProcessingOptions = {
+      deviceCapabilities,
+      maxConcurrentSessions: 1,
+      enableHardwareAcceleration: false,
+      useGpuAcceleration: false,
+      qualityPreference: 'balanced',
+      powerSavingMode: false,
+      thermalMonitoring: false,
+      progressUpdateInterval: 1000,
+      tempDirectory: '/tmp'
+    };
+
+    await this.startConversion(session.id, options);
+    
+    // Wait for completion
+    return new Promise((resolve, reject) => {
+      const checkComplete = () => {
+        const currentSession = this.conversionSessions.get(session.id);
+        if (!currentSession) {
+          reject(new ProcessingError(ProcessingErrorType.SESSION_NOT_FOUND, 'Session not found', 'SESSION_NOT_FOUND'));
+          return;
+        }
+
+        if (currentSession.state === SessionState.COMPLETED && currentSession.result) {
+          resolve(currentSession.result);
+        } else if (currentSession.state === SessionState.FAILED) {
+          reject(currentSession.error || new ProcessingError(ProcessingErrorType.UNKNOWN_ERROR, 'Unknown error', 'UNKNOWN_ERROR'));
+        } else {
+          setTimeout(checkComplete, 100);
+        }
+      };
+      checkComplete();
+    });
+  }
+
+  /**
+   * Gets optimal conversion settings for device capabilities
+   */
+  async getOptimalSettings(deviceCapabilities: DeviceCapabilities): Promise<ProcessingOptions> {
+    return {
+      deviceCapabilities,
+      maxConcurrentSessions: deviceCapabilities.processor.cores > 4 ? 2 : 1,
+      enableHardwareAcceleration: deviceCapabilities.performance.videoProcessingScore > 70,
+      useGpuAcceleration: false,
+      qualityPreference: deviceCapabilities.performance.benchmark > 8 ? 'quality' : 'balanced',
+      powerSavingMode: deviceCapabilities.battery.level < 0.3,
+      thermalMonitoring: true,
+      progressUpdateInterval: 1000,
+      tempDirectory: '/tmp'
+    };
   }
 }

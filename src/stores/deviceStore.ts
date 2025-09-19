@@ -110,6 +110,7 @@ interface DeviceState {
   updateMetrics: () => Promise<void>;
   checkCapabilities: () => Promise<void>;
   clearAlerts: () => void;
+  reset: () => void;
 }
 
 const deviceMonitor = new BasicDeviceMonitor();
@@ -182,6 +183,19 @@ export const useDeviceStore = create<DeviceState>()(
 
     clearAlerts: () => {
       set({ resourceAlerts: [] });
+    },
+
+    reset: () => {
+      set({
+        thermalState: null,
+        batteryLevel: null,
+        memoryUsage: null,
+        storageAvailable: null,
+        isMonitoring: false,
+        performanceMetrics: null,
+        deviceCapabilities: null,
+        resourceAlerts: [],
+      });
     },
   }))
 );
