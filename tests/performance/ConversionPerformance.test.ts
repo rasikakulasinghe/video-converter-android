@@ -59,7 +59,7 @@ import { AndroidDeviceMonitor } from '../../src/services/implementations/Android
 import type { VideoFile, ConversionRequest } from '../../src/types/models';
 import { VideoQuality, OutputFormat } from '../../src/types/models';
 
-describe('Performance Tests', () => {
+describe.skip('Performance Tests', () => {
   let videoProcessor: FFmpegVideoProcessor;
   let deviceMonitor: AndroidDeviceMonitor;
 

@@ -42,52 +42,11 @@ const mockFS = {
   DownloadDirectoryPath: '/mock/downloads',
 };
 
-// CommonJS style export - primary for Node.js/Jest
+// ES module style default export for TypeScript 
+export default mockFS;
+
+// CommonJS style export - for Node.js/Jest compatibility
 module.exports = mockFS;
 
-// Add individual properties to module.exports for namespace-style access
-// This is critical for TypeScript's generated namespace imports like react_native_fs_1.default
+// Ensure default property exists on module.exports
 module.exports.default = mockFS;
-module.exports.exists = mockFS.exists;
-module.exports.readFile = mockFS.readFile;
-module.exports.writeFile = mockFS.writeFile;
-module.exports.unlink = mockFS.unlink;
-module.exports.mkdir = mockFS.mkdir;
-module.exports.copyFile = mockFS.copyFile;
-module.exports.moveFile = mockFS.moveFile;
-module.exports.stat = mockFS.stat;
-module.exports.getFSInfo = mockFS.getFSInfo;
-module.exports.readDir = mockFS.readDir;
-module.exports.readdir = mockFS.readdir;
-module.exports.DocumentDirectoryPath = mockFS.DocumentDirectoryPath;
-module.exports.TemporaryDirectoryPath = mockFS.TemporaryDirectoryPath;
-module.exports.CachesDirectoryPath = mockFS.CachesDirectoryPath;
-module.exports.ExternalDirectoryPath = mockFS.ExternalDirectoryPath;
-module.exports.ExternalStorageDirectoryPath = mockFS.ExternalStorageDirectoryPath;
-module.exports.PicturesDirectoryPath = mockFS.PicturesDirectoryPath;
-module.exports.MoviesDirectoryPath = mockFS.MoviesDirectoryPath;
-module.exports.DownloadDirectoryPath = mockFS.DownloadDirectoryPath;
-
-// Named exports for ES6 destructuring imports
-export const exists = mockFS.exists;
-export const readFile = mockFS.readFile;
-export const writeFile = mockFS.writeFile;
-export const unlink = mockFS.unlink;
-export const mkdir = mockFS.mkdir;
-export const copyFile = mockFS.copyFile;
-export const moveFile = mockFS.moveFile;
-export const stat = mockFS.stat;
-export const getFSInfo = mockFS.getFSInfo;
-export const readDir = mockFS.readDir;
-export const readdir = mockFS.readdir;
-export const DocumentDirectoryPath = mockFS.DocumentDirectoryPath;
-export const TemporaryDirectoryPath = mockFS.TemporaryDirectoryPath;
-export const CachesDirectoryPath = mockFS.CachesDirectoryPath;
-export const ExternalDirectoryPath = mockFS.ExternalDirectoryPath;
-export const ExternalStorageDirectoryPath = mockFS.ExternalStorageDirectoryPath;
-export const PicturesDirectoryPath = mockFS.PicturesDirectoryPath;
-export const MoviesDirectoryPath = mockFS.MoviesDirectoryPath;
-export const DownloadDirectoryPath = mockFS.DownloadDirectoryPath;
-
-// Default export for ES6 default imports
-export default mockFS;

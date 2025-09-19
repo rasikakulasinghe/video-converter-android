@@ -21,6 +21,10 @@ import { VideoQuality, OutputFormat } from '../../src/types/models';
 // Mock external dependencies
 jest.mock('ffmpeg-kit-react-native', () => ({
   FFmpegKit: {
+    execute: jest.fn().mockResolvedValue({
+      getReturnCode: () => ({ getValue: () => 0 }),
+      getOutput: () => 'frame=100 fps=30.0 q=28.0 size=1024kB time=00:00:03.33 bitrate=2511.4kbits/s speed=1.0x',
+    }),
     executeAsync: jest.fn(),
     cancel: jest.fn(),
     listSessions: jest.fn(() => []),
@@ -28,6 +32,7 @@ jest.mock('ffmpeg-kit-react-native', () => ({
   ReturnCode: {
     SUCCESS: 0,
     CANCEL: 255,
+    isSuccess: jest.fn((code) => code === 0),
   },
 }));
 
@@ -35,6 +40,10 @@ jest.mock('react-native-fs', () => ({
   DocumentDirectoryPath: '/mock/documents',
   exists: jest.fn(() => Promise.resolve(true)),
   stat: jest.fn(() => Promise.resolve({ size: 1000000 })),
+  getFSInfo: jest.fn(() => Promise.resolve({
+    totalSpace: 64 * 1024 * 1024 * 1024, // 64GB
+    freeSpace: 32 * 1024 * 1024 * 1024,  // 32GB available
+  })),
   mkdir: jest.fn(() => Promise.resolve()),
   unlink: jest.fn(() => Promise.resolve()),
 }));

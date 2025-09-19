@@ -3,7 +3,7 @@
  * Handles video conversion job management, progress tracking, and result handling.
  */
 
-import { VideoFile, VideoFormat, VideoQuality, OutputFormat } from './index';
+import { VideoFile, VideoFormat, VideoQuality } from './index';
 
 /**
  * Conversion status enumeration
@@ -22,9 +22,9 @@ export enum ConversionStatus {
  * Compression level enumeration
  */
 export enum CompressionLevel {
-  FAST = 'fast',
-  BALANCED = 'balanced',
-  QUALITY = 'quality',
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
   MAXIMUM = 'maximum',
 }
 
@@ -42,30 +42,30 @@ export enum OutputQuality {
  * Conversion progress information
  */
 export interface ConversionProgress {
-  /** Current progress percentage (0.0 to 1.0) */
+  /** Current progress percentage (0.0 to 100.0) */
   percentage: number;
   /** Processed frames */
   processedFrames: number;
   /** Total frames to process */
   totalFrames: number;
+  /** Current processing step */
+  currentStep: string;
+  /** Elapsed time in seconds */
+  timeElapsed: number;
+  /** Estimated time remaining in seconds */
+  timeRemaining: number;
   /** Current processing speed (fps) */
   currentFps: number;
   /** Average processing speed (fps) */
   averageFps: number;
-  /** Estimated time remaining in seconds */
-  estimatedTimeRemaining: number;
-  /** Elapsed time in seconds */
-  elapsedTime: number;
-  /** Currently processing stage */
-  currentStage: string;
-  /** Output file size so far in bytes */
-  outputSize: number;
-  /** Memory usage during conversion in bytes */
-  memoryUsage: number;
-  /** CPU usage percentage (0.0 to 1.0) */
-  cpuUsage: number;
-  /** Timestamp of last update */
-  lastUpdate: Date;
+  /** Bytes processed so far (optional) */
+  bytesProcessed?: number;
+  /** Total bytes to process (optional) */
+  totalBytes?: number;
+  /** CPU usage percentage (optional) */
+  cpuUsage?: number;
+  /** Memory usage in MB (optional) */
+  memoryUsage?: number;
 }
 
 /**
@@ -73,30 +73,27 @@ export interface ConversionProgress {
  */
 export interface ConversionSettings {
   /** Target output format */
-  outputFormat: OutputFormat;
+  outputFormat: VideoFormat;
   /** Video quality level */
   quality: OutputQuality;
   /** Compression level */
   compression: CompressionLevel;
   /** Target bitrate in bps */
-  targetBitrate?: number;
-  /** Target frame rate */
-  targetFrameRate?: number;
-  /** Target resolution */
-  targetResolution?: {
-    width: number;
-    height: number;
-  };
-  /** Audio codec */
-  audioCodec: 'aac' | 'mp3' | 'opus';
-  /** Audio bitrate in bps */
-  audioBitrate?: number;
-  /** Whether to preserve metadata */
-  preserveMetadata: boolean;
-  /** Whether to use hardware acceleration */
-  useHardwareAcceleration: boolean;
-  /** Additional FFmpeg options */
-  customOptions?: string[];
+  targetBitrate: number;
+  /** Maximum width */
+  maxWidth: number;
+  /** Maximum height */
+  maxHeight: number;
+  /** Whether to maintain aspect ratio */
+  maintainAspectRatio: boolean;
+  /** Frame rate (optional advanced setting) */
+  frameRate?: number;
+  /** Audio codec (optional advanced setting) */
+  audioCodec?: 'aac' | 'mp3' | 'opus';
+  /** Video CRF (optional advanced setting) */
+  videoCrf?: number;
+  /** Encoding preset (optional advanced setting) */
+  preset?: string;
 }
 
 /**
@@ -106,23 +103,17 @@ export interface ConversionRequest {
   /** Unique request identifier */
   id: string;
   /** Source video file */
-  sourceFile: VideoFile;
-  /** Desired output filename */
-  outputFileName: string;
-  /** Output directory path */
+  inputFile: VideoFile;
+  /** Output file path */
   outputPath: string;
   /** Conversion settings */
   settings: ConversionSettings;
-  /** Request priority */
-  priority: 'low' | 'normal' | 'high' | 'urgent';
-  /** Whether to overwrite existing files */
-  overwriteExisting: boolean;
   /** Request timestamp */
-  requestedAt: Date;
-  /** User identifier */
-  userId?: string;
-  /** Additional metadata */
-  metadata?: Record<string, any>;
+  createdAt: Date;
+  /** Optional user notes */
+  userNotes?: string;
+  /** Request priority */
+  priority?: 'low' | 'normal' | 'high' | 'urgent';
 }
 
 /**
@@ -133,34 +124,20 @@ export interface ConversionResult {
   success: boolean;
   /** Output file information */
   outputFile?: VideoFile;
-  /** Final file size in bytes */
-  outputSize?: number;
-  /** Total processing time in seconds */
-  totalTime: number;
-  /** Average processing speed (fps) */
-  averageSpeed: number;
+  /** Processing time in seconds */
+  processingTime: number;
+  /** Final progress information */
+  finalProgress: ConversionProgress;
+  /** Completion timestamp */
+  completedAt: Date;
   /** Compression ratio achieved */
   compressionRatio?: number;
-  /** Quality metrics */
-  qualityMetrics?: {
-    psnr?: number;
-    ssim?: number;
-    vmaf?: number;
-  };
-  /** Error information if failed */
+  /** Error information (if failed) */
   error?: {
     code: string;
     message: string;
-    details?: any;
+    details?: string;
   };
-  /** Warnings encountered */
-  warnings: string[];
-  /** FFmpeg command used */
-  ffmpegCommand?: string;
-  /** FFmpeg logs */
-  logs?: string[];
-  /** Completion timestamp */
-  completedAt: Date;
 }
 
 /**
@@ -183,22 +160,8 @@ export interface ConversionJob {
   startedAt?: Date;
   /** Job completion timestamp */
   completedAt?: Date;
-  /** Last update timestamp */
-  updatedAt: Date;
-  /** Number of retry attempts */
-  retryCount: number;
-  /** Maximum allowed retries */
-  maxRetries: number;
-  /** Job cancellation reason */
-  cancellationReason?: string;
-  /** Whether job can be retried */
-  canRetry: boolean;
-  /** Device resources snapshot at job start */
-  deviceSnapshot?: any;
-  /** Job priority */
-  priority: 'low' | 'normal' | 'high' | 'urgent';
   /** Estimated completion time */
-  estimatedCompletion?: Date;
+  estimatedCompletionAt?: Date;
 }
 
 /**

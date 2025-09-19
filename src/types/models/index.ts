@@ -28,6 +28,12 @@ export enum OutputFormat {
   MKV = 'MKV',
 }
 
+// Export ConversionStatus from ConversionJob
+export { ConversionStatus } from './ConversionJob';
+
+// Export ThermalState from DeviceCapabilities
+export { ThermalState } from './DeviceCapabilities';
+
 export interface VideoMetadata {
   duration: number;
   width: number;

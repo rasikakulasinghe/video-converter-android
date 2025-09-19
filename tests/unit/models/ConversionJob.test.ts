@@ -14,8 +14,8 @@ import {
   ConversionSettings,
   CompressionLevel,
   OutputQuality
-} from '@types/models/ConversionJob';
-import { VideoFile, VideoFormat } from '@types/models/VideoFile';
+} from '../../../src/types/models/ConversionJob';
+import { VideoFile, VideoFormat } from '../../../src/types/models/index';
 
 describe('ConversionJob Model', () => {
   describe('ConversionStatus Enum', () => {
