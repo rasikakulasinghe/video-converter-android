@@ -1,3 +1,4 @@
+import * as FileSystem from 'expo-file-system';
 import RNFS from 'react-native-fs';
 import { Platform, PermissionsAndroid } from 'react-native';
 import {
@@ -39,15 +40,15 @@ export class ReactNativeFileManager implements FileManagerService {
   private watchers: Map<string, FileWatcher> = new Map();
 
   constructor() {
-    this.appDirectory = RNFS.DocumentDirectoryPath;
-    this.tempDirectory = `${RNFS.CachesDirectoryPath}/video-converter`;
-    this.outputDirectory = `${RNFS.DocumentDirectoryPath}/converted-videos`;
+    this.appDirectory = FileSystem.documentDirectory || '';
+    this.tempDirectory = `${FileSystem.cacheDirectory}video-converter/`;
+    this.outputDirectory = `${FileSystem.documentDirectory}converted-videos/`;
   }
 
   // File operations
   async getFileInfo(filePath: string): Promise<FileInfo> {
     try {
-      const stat = await RNFS.stat(filePath);
+      const stat = await FileSystem.getInfoAsync(filePath);
       
       return {
         name: this.getFileName(filePath),

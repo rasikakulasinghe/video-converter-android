@@ -1,4 +1,5 @@
 import { FFmpegKit, FFmpegSession, ReturnCode, Statistics, Log } from 'ffmpeg-kit-react-native';
+import * as FileSystem from 'expo-file-system';
 import RNFS from 'react-native-fs';
 import {
   VideoProcessorService,

@@ -65,3 +65,9 @@ export interface ConversionSettings {
   audioCodec: 'aac' | 'mp3';
   preserveMetadata: boolean;
 }
+
+// Export all the main types
+export type { ConversionRequest, ConversionValidationResult, ConversionQualityPreset, ConversionOptions } from './ConversionRequest';
+export type { ConversionResult, ConversionResultValidationResult, ConversionError, ErrorSeverity } from './ConversionResult';
+export type { ConversionProgress } from './ConversionResult';
+export type { VideoValidationResult } from './VideoFile';

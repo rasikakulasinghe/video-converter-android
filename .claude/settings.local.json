@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(npm run typecheck:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "WebSearch",
+      "Bash(npx create-expo-app:*)",
+      "Read(//d/Projects/Current Projects/**)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npx eas-cli@latest:*)",
+      "Bash(npx expo start:*)",
+      "Bash(timeout 30 npx expo start --no-dev --minify)"
     ],
     "deny": [],
     "ask": []
