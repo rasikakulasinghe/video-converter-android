@@ -63,6 +63,11 @@ interface DeviceState {
   lastUpdate: Date | null;
   autoRefreshEnabled: boolean;
   autoRefreshInterval: number;
+  
+  // Computed properties for MainScreen compatibility
+  batteryLevel: number;
+  isLowPowerMode: boolean;
+  availableStorage: number;
 
   // Actions
   loadDeviceInfo: () => Promise<void>;
@@ -162,6 +167,20 @@ export const useDeviceStore = create<DeviceState>()(
     let eventSubscriptionId: string | null = null;
     let activeSessions: { [key: string]: MonitoringSession } = {};
 
+    // Helper function to compute derived properties
+    const computeDerivedProperties = (state: Partial<DeviceState>) => {
+      const currentState = get();
+      const batteryLevel = state.batteryInfo?.level ?? currentState.batteryLevel;
+      const isLowPowerMode = state.powerState?.isPowerSaveMode ?? currentState.isLowPowerMode;
+      const availableStorage = state.storageInfo?.availableSpace ?? currentState.availableStorage;
+      
+      return {
+        batteryLevel,
+        isLowPowerMode,
+        availableStorage,
+      };
+    };
+
     return {
       // Initial state
       thermalState: null,
@@ -187,6 +206,11 @@ export const useDeviceStore = create<DeviceState>()(
       lastUpdate: null,
       autoRefreshEnabled: false,
       autoRefreshInterval: 10000,
+      
+      // Computed properties initial values
+      batteryLevel: 0,
+      isLowPowerMode: false,
+      availableStorage: 0,
 
       // Core loading action
       loadDeviceInfo: async (): Promise<void> => {
@@ -217,7 +241,7 @@ export const useDeviceStore = create<DeviceState>()(
             deviceMonitorService.getPerformanceProfile(),
           ]);
 
-          set({
+          const newState = {
             thermalState,
             batteryInfo,
             memoryInfo,
@@ -230,6 +254,11 @@ export const useDeviceStore = create<DeviceState>()(
             activeProfile,
             lastUpdate: new Date(),
             isLoading: false,
+          };
+          
+          set({
+            ...newState,
+            ...computeDerivedProperties(newState),
           });
         } catch (error) {
           console.error('Failed to load device info:', error);

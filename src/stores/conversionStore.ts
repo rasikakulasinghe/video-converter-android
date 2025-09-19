@@ -113,6 +113,7 @@ interface ConversionActions {
   pauseConversion: () => Promise<boolean>;
   resumeConversion: () => Promise<boolean>;
   retryConversion: (jobId: string) => Promise<boolean>;
+  clearJob: () => void;
   
   // Queue management
   addToQueue: (item: Omit<QueueItem, 'id' | 'addedAt'>) => string;
@@ -458,6 +459,14 @@ export const useConversionStore = create<ConversionStore>()(
         console.error('Failed to retry conversion:', error);
         return false;
       }
+    },
+
+    clearJob: (): void => {
+      set({ 
+        currentJob: null,
+        isProcessing: false,
+        isPaused: false
+      });
     },
 
     addToQueue: (item: Omit<QueueItem, 'id' | 'addedAt'>): string => {

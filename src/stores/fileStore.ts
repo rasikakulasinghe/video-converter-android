@@ -37,6 +37,7 @@ interface FileState {
   files: FileInfo[];
   videoFiles: VideoFile[];
   selectedFiles: string[];
+  processedFiles: VideoFile[];  // Add this property
 
   // Storage information
   storageInfo: Record<StorageLocation, StorageInfo | null>;
@@ -80,6 +81,11 @@ interface FileState {
   selectMultipleFiles: (filePaths: string[]) => void;
   deselectFile: (filePath: string) => void;
   clearSelection: () => void;
+  
+  // Video file management for MainScreen
+  addFile: (file: VideoFile) => void;
+  removeFile: (fileId: string) => void;
+  clearFiles: () => void;
   
   // File manipulation
   createFile: (filePath: string, content: Uint8Array) => Promise<void>;
@@ -208,6 +214,7 @@ export const useFileStore = create<FileState>()(
       files: [],
       videoFiles: [],
       selectedFiles: [],
+      processedFiles: [],
       storageInfo: {
         [StorageLocation.INTERNAL]: null,
         [StorageLocation.EXTERNAL]: null,
@@ -302,6 +309,24 @@ export const useFileStore = create<FileState>()(
 
       clearSelection: (): void => {
         set({ selectedFiles: [] });
+      },
+
+      // Video file management for MainScreen
+      addFile: (file: VideoFile): void => {
+        const { processedFiles } = get();
+        const exists = processedFiles.find(f => f.id === file.id);
+        if (!exists) {
+          set({ processedFiles: [...processedFiles, file] });
+        }
+      },
+
+      removeFile: (fileId: string): void => {
+        const { processedFiles } = get();
+        set({ processedFiles: processedFiles.filter(f => f.id !== fileId) });
+      },
+
+      clearFiles: (): void => {
+        set({ processedFiles: [] });
       },
 
       // File operations

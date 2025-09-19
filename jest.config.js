@@ -38,8 +38,10 @@ module.exports = {
     '^@hooks/(.*)$': '<rootDir>/src/hooks/$1',
     '^@stores/(.*)$': '<rootDir>/src/stores/$1',
     '^@utils/(.*)$': '<rootDir>/src/utils/$1',
+    // Mock React Native components for testing
+    '^react-native$': '<rootDir>/tests/mocks/react-native.ts',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|react-native-.*|@react-navigation)/)',
+    'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-.*)/)',
   ],
 };

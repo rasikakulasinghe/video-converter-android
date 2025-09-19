@@ -113,6 +113,20 @@ export interface ConversionOptions {
 }
 
 /**
+ * Conversion settings for the UI
+ */
+export interface ConversionSettings {
+  /** Output quality level */
+  quality: 'low' | 'medium' | 'high';
+  /** Output format */
+  format: 'mp4' | 'webm';
+  /** Audio codec */
+  audioCodec: 'aac' | 'mp3';
+  /** Whether to preserve original metadata */
+  preserveMetadata: boolean;
+}
+
+/**
  * Quality preset configuration
  */
 export interface ConversionQualityPreset {
