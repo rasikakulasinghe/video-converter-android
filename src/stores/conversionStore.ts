@@ -81,6 +81,9 @@ interface ConversionState {
   currentJob: ConversionJob | null;
   jobHistory: ConversionJob[];
   
+  // Current progress (computed from currentJob)
+  progress: ConversionProgress | null;
+  
   // Queue management
   queue: QueueItem[];
   isQueueActive: boolean;
@@ -159,6 +162,10 @@ export const useConversionStore = create<ConversionStore>()(
     // Initial state
     currentJob: null,
     jobHistory: [],
+    
+    // Current progress (computed from currentJob)
+    progress: null,
+    
     queue: [],
     isQueueActive: false,
     maxConcurrentJobs: 1,
@@ -215,6 +222,7 @@ export const useConversionStore = create<ConversionStore>()(
       // Update state
       set(state => ({
         currentJob: job,
+        progress: job.progress,
         isProcessing: true,
         stats: {
           ...state.stats,
@@ -338,6 +346,7 @@ export const useConversionStore = create<ConversionStore>()(
 
         set(state => ({
           currentJob: null,
+          progress: null,
           isProcessing: false,
           jobHistory: [completedJob, ...state.jobHistory],
         }));
@@ -464,6 +473,7 @@ export const useConversionStore = create<ConversionStore>()(
     clearJob: (): void => {
       set({ 
         currentJob: null,
+        progress: null,
         isProcessing: false,
         isPaused: false
       });

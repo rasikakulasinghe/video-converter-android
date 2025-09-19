@@ -6,7 +6,7 @@ import type { NavigationProp } from '@react-navigation/native';
 import { Text } from '../components/atoms/Text';
 import { Button } from '../components/atoms/Button';
 import { FileCard } from '../components/molecules/FileCard';
-import { ProgressCard } from '../components/molecules/ProgressCard';
+import { ProgressCard, ConversionProgress as ProgressCardProgress } from '../components/molecules/ProgressCard';
 import { ConversionForm } from '../components/molecules/ConversionForm';
 import { ActionSheet } from '../components/molecules/ActionSheet';
 
@@ -17,6 +17,7 @@ import { useFileManager } from '../hooks/useFileManager';
 import { useVideoProcessor } from '../hooks/useVideoProcessor';
 
 import type { VideoFile, ConversionRequest, ConversionSettings } from '../types/models';
+import { VideoQuality, OutputFormat } from '../types/models';
 import type { RootStackParamList } from '../types/navigation';
 
 interface MainScreenProps {}
@@ -56,8 +57,7 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
   const {
     thermalState,
     batteryLevel,
-    isLowPowerMode,
-    availableStorage,
+    storageAvailable: availableStorage,
   } = useDeviceStore();
   
   // Service hooks
@@ -101,19 +101,7 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
     }
     
     // Check device state
-    if (isLowPowerMode) {
-      Alert.alert(
-        'Low Power Mode',
-        'Device is in low power mode. Conversion may be slower than usual.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Continue', onPress: () => proceedWithConversion(settings) },
-        ]
-      );
-      return;
-    }
-    
-    if (batteryLevel < 0.2) {
+    if (batteryLevel !== null && batteryLevel < 0.2) {
       Alert.alert(
         'Low Battery',
         'Battery level is low. Consider charging before conversion.',
@@ -124,16 +112,25 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
       );
       return;
     }
-    
+
     proceedWithConversion(settings);
-  }, [selectedFiles, isLowPowerMode, batteryLevel]);
-  
-  const proceedWithConversion = useCallback(async (settings: ConversionSettings) => {
+  }, [selectedFiles, batteryLevel]);  const proceedWithConversion = useCallback(async (settings: ConversionSettings) => {
     try {
+      // Process the first file for now (single file conversion)
+      if (selectedVideoFiles.length === 0) return;
+      
+      const firstFile = selectedVideoFiles[0];
+      if (!firstFile) return; // Type guard
+      
       const request: ConversionRequest = {
-        files: selectedVideoFiles,
-        settings,
-        timestamp: Date.now(),
+        id: `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        inputFile: firstFile,
+        outputPath: `${firstFile.path.replace(/\.[^/.]+$/, "")}_converted.mp4`,
+        targetQuality: settings.quality === 'low' ? VideoQuality.SD : 
+                       settings.quality === 'medium' ? VideoQuality.HD : VideoQuality.FULL_HD,
+        outputFormat: settings.format === 'mp4' ? OutputFormat.MP4 : OutputFormat.MP4,
+        createdAt: new Date(),
+        priority: 'normal',
       };
       
       await startConversion(request);
@@ -184,7 +181,7 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
   
   // Handle navigation to results
   const handleViewResults = useCallback(() => {
-    navigation.navigate('Results');
+    navigation.navigate('Results', {});
   }, [navigation]);
   
   // Handle navigation to settings
@@ -218,7 +215,7 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
       );
     }
     
-    if (availableStorage < 1000000000) { // Less than 1GB
+    if (availableStorage !== null && availableStorage < 1000000000) { // Less than 1GB
       return (
         <View className="mx-4 mb-4 p-3 bg-yellow-100 rounded-lg border border-yellow-300">
           <Text className="text-yellow-700 text-sm font-medium">
@@ -258,9 +255,20 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
       {isProcessing && currentJob && (
         <View className="mx-4 mb-4">
           <ProgressCard
-            progress={progress}
+            videoFile={{
+              filename: currentJob.request.inputFile.name,
+              size: currentJob.request.inputFile.size,
+              duration: currentJob.request.inputFile.metadata.duration / 1000,
+              resolution: `${currentJob.request.inputFile.metadata.width}x${currentJob.request.inputFile.metadata.height}`,
+              format: currentJob.request.inputFile.mimeType.split('/')[1]?.toUpperCase() || 'VIDEO'
+            }}
+            status="converting"
+            progress={{
+              percentage: progress?.percentage || 0,
+              estimatedTimeRemaining: progress?.estimatedTimeRemaining || 0,
+              phase: 'converting' as const
+            }}
             onCancel={handleCancelConversion}
-            onViewDetails={() => {}}
           />
         </View>
       )}

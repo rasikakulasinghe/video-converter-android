@@ -44,6 +44,7 @@
     "index.js",
     "App.tsx",
     "nativewind-env.d.ts",
+    "react-native-types.d.ts",
     "**/*.ts",
     "**/*.tsx"
   ],

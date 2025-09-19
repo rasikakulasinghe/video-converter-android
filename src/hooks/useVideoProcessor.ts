@@ -28,6 +28,8 @@ export interface UseVideoProcessorReturn {
   currentSession: ConversionSession | null;
   /** Start a video conversion */
   startConversion: (request: ConversionRequest) => Promise<ConversionSession | null>;
+  /** Convert video (alias for startConversion for compatibility) */
+  convertVideo: (request: ConversionRequest) => Promise<ConversionSession | null>;
   /** Cancel the current conversion */
   cancelConversion: () => Promise<boolean>;
   /** Pause the current conversion */
@@ -288,6 +290,7 @@ export const useVideoProcessor = (
     progress,
     currentSession,
     startConversion,
+    convertVideo: startConversion, // Alias for compatibility
     cancelConversion,
     pauseConversion,
     resumeConversion,

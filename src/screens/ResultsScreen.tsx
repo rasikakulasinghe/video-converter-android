@@ -154,7 +154,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = () => {
                 <FileCard
                   key={file.id}
                   file={file}
-                  state="completed"
+                  state="normal"
                   onPress={() => handleFilePress(file)}
                 />
               ))}
