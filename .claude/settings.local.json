@@ -8,9 +8,7 @@
       "Read(//d/Projects/Current Projects/**)",
       "Bash(npm install)",
       "Bash(npm install:*)",
-      "Bash(npx eas-cli@latest:*)",
-      "Bash(npx expo start:*)",
-      "Bash(timeout 30 npx expo start --no-dev --minify)"
+      "Bash(npx expo start:*)"
     ],
     "deny": [],
     "ask": []
