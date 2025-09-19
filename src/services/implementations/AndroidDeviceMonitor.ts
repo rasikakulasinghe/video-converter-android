@@ -1,4 +1,4 @@
-import DeviceInfo from 'react-native-device-info';
+// This file will be deleted immediatelyimport DeviceInfo from 'react-native-device-info';
 import { Platform, AppState, AppStateStatus } from 'react-native';
 import {
   DeviceMonitorService,
