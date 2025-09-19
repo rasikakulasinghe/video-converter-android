@@ -14,9 +14,15 @@ import {
   NotificationSettings,
   Theme,
   StorageLocation,
-  PerformanceMode
-} from '@types/models/AppSettings';
-import { VideoFormat, OutputQuality, CompressionLevel } from '@types/models/ConversionJob';
+  PerformanceMode,
+  VideoFormat,
+  OutputQuality,
+  CompressionLevel,
+  createDefaultAppSettings,
+  validateAppSettings,
+  migrateAppSettings,
+  mergeAppSettings
+} from '../../../src/types/models/AppSettings';
 
 describe('AppSettings Model', () => {
   describe('Theme Enum', () => {

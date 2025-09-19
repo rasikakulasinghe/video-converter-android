@@ -302,3 +302,4 @@ export * from './VideoFile';
 export * from './ConversionRequest';
 export * from './ConversionResult';
 export * from './DeviceCapabilities';
+export * from './AppSettings';
