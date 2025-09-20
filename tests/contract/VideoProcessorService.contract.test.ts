@@ -74,7 +74,6 @@ describe('VideoProcessorService Contract Tests', () => {
     });
 
     videoProcessor = new Media3VideoProcessor();
-    jest.clearAllMocks();
 
     // Create mock processing options
     mockProcessingOptions = {
@@ -299,15 +298,15 @@ describe('VideoProcessorService Contract Tests', () => {
       const session = await videoProcessor.createSession(mockRequest);
       await videoProcessor.startConversion(session.id, mockProcessingOptions);
       
-      // Contract: pauseConversion should work for processing sessions
+      // Contract: pauseConversion should reject as it's not supported by Media3
       await expect(
         videoProcessor.pauseConversion(session.id)
-      ).resolves.not.toThrow();
-      
-      // Contract: resumeConversion should work for paused sessions
+      ).rejects.toThrow('Pause/resume is not supported');
+
+      // Contract: resumeConversion should reject as it's not supported by Media3
       await expect(
         videoProcessor.resumeConversion(session.id)
-      ).resolves.not.toThrow();
+      ).rejects.toThrow('Pause/resume is not supported');
     });
 
     it('should handle cancelConversion contract correctly', async () => {

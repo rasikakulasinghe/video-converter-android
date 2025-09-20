@@ -17,11 +17,7 @@ import {
   PerformanceMode,
   VideoFormat,
   OutputQuality,
-  CompressionLevel,
-  createDefaultAppSettings,
-  validateAppSettings,
-  migrateAppSettings,
-  mergeAppSettings
+  CompressionLevel
 } from '../../../src/types/models/AppSettings';
 
 describe('AppSettings Model', () => {
@@ -401,7 +397,12 @@ describe('AppSettings Model', () => {
       const currentSettings: AppSettings = {} as AppSettings; // Mock for test
       const updates = {
         theme: {
-          theme: Theme.DARK
+          theme: Theme.DARK,
+          followSystemTheme: false,
+          primaryColor: '#000000',
+          accentColor: '#333333',
+          enableAnimations: true,
+          reducedMotion: false
         }
       };
 

@@ -33,20 +33,47 @@ describe('VideoProcessorService Contract', () => {
   beforeEach(() => {
     // Mock device capabilities
     mockDeviceCapabilities = {
-      processingPower: 0.85,
-      memoryScore: 0.80,
-      storageScore: 0.75,
-      batteryScore: 0.90,
-      thermalScore: 0.85,
-      overallScore: 0.83,
-      recommendedQuality: 'high',
-      limits: {
-        maxConcurrentJobs: 2,
-        maxResolution: { width: 1920, height: 1080 },
-        maxDuration: 3600,
-        maxFileSize: 2147483648,
-        maxBitrate: 10000000,
-        hardwareAcceleration: true
+      id: 'test-device-001',
+      deviceModel: 'Test Device',
+      androidVersion: '12',
+      apiLevel: 31,
+      architecture: 'arm64-v8a',
+      lastUpdated: new Date(),
+      battery: {
+        level: 0.90,
+        isCharging: false,
+        health: 'good',
+        temperature: 25,
+        voltage: 4.2,
+        capacity: 4000,
+      },
+      memory: {
+        totalRam: 8589934592, // 8GB
+        availableRam: 4294967296, // 4GB
+        usedRam: 4294967296, // 4GB
+        totalStorage: 137438953472, // 128GB
+        availableStorage: 68719476736, // 64GB
+        usedStorage: 68719476736, // 64GB
+        isLowMemory: false,
+      },
+      thermal: {
+        state: 'normal' as any,
+        temperature: 30,
+        throttleLevel: 0,
+        maxSafeTemperature: 85,
+      },
+      processor: {
+        cores: 8,
+        maxFrequency: 2400,
+        currentFrequency: 1800,
+        usage: 25,
+        architecture: 'arm64-v8a',
+      },
+      performance: {
+        benchmark: 85,
+        videoProcessingScore: 80,
+        thermalEfficiency: 75,
+        batteryEfficiency: 85,
       }
     };
 
@@ -614,9 +641,9 @@ describe('VideoProcessorService Contract', () => {
       const profiles = await mockVideoProcessor.getQualityProfiles();
       
       expect(profiles).toHaveLength(3);
-      expect(profiles[0].quality).toBe(VideoQuality.LOW);
-      expect(profiles[1].quality).toBe(VideoQuality.HD);
-      expect(profiles[2].quality).toBe(VideoQuality.FULL_HD);
+      expect(profiles[0]?.quality).toBe(VideoQuality.LOW);
+      expect(profiles[1]?.quality).toBe(VideoQuality.HD);
+      expect(profiles[2]?.quality).toBe(VideoQuality.FULL_HD);
     });
   });
 
