@@ -156,13 +156,15 @@ export class Media3VideoProcessor implements VideoProcessorService {
   private async initializeDeviceCapabilities(): Promise<void> {
     try {
       const capabilities = await this.nativeModule.getCapabilities();
+      // Use default capabilities and update based on native capabilities
       this.deviceCapabilities = {
-        processingPower: capabilities.supportsHardwareAcceleration ? 'high' : 'medium',
-        availableMemory: 1000, // MB - would need device-specific detection
-        thermalState: ThermalState.NORMAL,
-        supportedCodecs: capabilities.supportedInputFormats,
-        hardwareAcceleration: capabilities.supportsHardwareAcceleration,
-        maxConcurrentSessions: capabilities.maxConcurrentSessions,
+        ...this.getDefaultCapabilities(),
+        performance: {
+          benchmark: capabilities.supportsHardwareAcceleration ? 85 : 65,
+          videoProcessingScore: capabilities.supportsHardwareAcceleration ? 90 : 70,
+          thermalEfficiency: 80,
+          batteryEfficiency: 75,
+        },
       };
     } catch (error) {
       console.warn('Failed to initialize device capabilities:', error);
@@ -184,22 +186,22 @@ export class Media3VideoProcessor implements VideoProcessorService {
         health: 'good',
         temperature: 25.0,
         voltage: 4.0,
-        chargingStatus: 'unknown',
+        capacity: 4000,
       },
       memory: {
-        totalRAM: 4096,
-        availableRAM: 2048,
-        usedRAM: 2048,
-        totalStorage: 64000,
-        availableStorage: 32000,
-        usedStorage: 32000,
-        lowMemoryThreshold: 512,
+        totalRam: 4096 * 1024 * 1024, // 4GB in bytes
+        availableRam: 2048 * 1024 * 1024, // 2GB in bytes
+        usedRam: 2048 * 1024 * 1024, // 2GB in bytes
+        totalStorage: 64000 * 1024 * 1024, // 64GB in bytes
+        availableStorage: 32000 * 1024 * 1024, // 32GB in bytes
+        usedStorage: 32000 * 1024 * 1024, // 32GB in bytes
+        isLowMemory: false,
       },
       thermal: {
         state: ThermalState.NORMAL,
         temperature: 25.0,
         throttleLevel: 0,
-        coolingTimeEstimate: 0,
+        maxSafeTemperature: 85.0,
       },
       processor: {
         cores: 8,
@@ -208,81 +210,69 @@ export class Media3VideoProcessor implements VideoProcessorService {
         usage: 30,
         architecture: 'arm64-v8a',
       },
-      network: {
-        isConnected: true,
-        type: 'wifi',
-        strength: 80,
-        isMetered: false,
-        uploadSpeed: 10000000,
-        downloadSpeed: 50000000,
-        latency: 20,
-      },
-      graphics: {
-        vendor: 'Qualcomm',
-        renderer: 'Adreno',
-        version: '6.0',
-        supportsHardwareAcceleration: true,
-        maxTextureSize: 4096,
-        shaderVersion: '320 es',
-      },
-      storage: {
-        totalInternal: 64000,
-        availableInternal: 32000,
-        totalExternal: undefined,
-        availableExternal: undefined,
-      },
-      optimizationPreferences: {
-        preferQuality: false,
-        preferSpeed: true,
-        enableHardwareAcceleration: true,
-        maxConcurrentOperations: 2,
-        thermalThrottlingEnabled: true,
-        batteryOptimizationEnabled: true,
-        networkOptimizationEnabled: false,
+      performance: {
+        benchmark: 75,
+        videoProcessingScore: 80,
+        thermalEfficiency: 85,
+        batteryEfficiency: 80,
       },
     };
   }
 
-  async startConversion(request: ConversionRequest): Promise<string> {
+  async createSession(request: ConversionRequest): Promise<ConversionSession> {
     const sessionId = this.generateSessionId();
 
     const session: ConversionSession = {
       id: sessionId,
       request,
-      state: SessionState.INITIALIZING,
+      state: SessionState.CREATED,
       progress: {
         percentage: 0,
         processedDuration: 0,
         totalDuration: request.inputFile.metadata.duration,
         estimatedTimeRemaining: 0,
-        currentPhase: 'initializing',
+        currentPhase: 'created',
+        processingSpeed: 0,
       },
       createdAt: new Date(),
       statistics: {
         startTime: new Date(),
-        processingSpeed: 0,
-        memoryUsage: 0,
+        bytesProcessed: 0,
+        framesProcessed: 0,
+        averageSpeed: 0,
+        peakMemoryUsage: 0,
         cpuUsage: 0,
-        thermalState: ThermalState.NORMAL,
       },
     };
 
     this.activeSessions.set(sessionId, session);
+    return session;
+  }
+
+  async startConversion(sessionId: string, options: ProcessingOptions): Promise<void> {
+    const session = this.activeSessions.get(sessionId);
+    if (!session) {
+      throw new ProcessingError(
+        ProcessingErrorType.SESSION_NOT_FOUND,
+        'Conversion session not found',
+        'SESSION_NOT_FOUND',
+        { sessionId }
+      );
+    }
 
     try {
-      const config = this.createMedia3Config(request);
+      const config = this.createMedia3Config(session.request);
       await this.nativeModule.convertVideo(sessionId, config);
 
       session.state = SessionState.PROCESSING;
       session.progress.currentPhase = 'processing';
-
-      return sessionId;
+      session.startedAt = new Date();
     } catch (error) {
       session.state = SessionState.FAILED;
       session.error = new ProcessingError(
-        ProcessingErrorType.PROCESSING_FAILED,
-        `Failed to start conversion: ${error.message}`,
-        { originalError: error }
+        ProcessingErrorType.UNKNOWN_ERROR,
+        `Failed to start conversion: ${(error as Error).message}`,
+        'PROCESSING_FAILED'
       );
       throw session.error;
     }
@@ -295,38 +285,36 @@ export class Media3VideoProcessor implements VideoProcessorService {
       return {
         isValid: result.isValid,
         metadata: result.metadata,
-        supportedFormats: result.supportedFormats.map(this.mapToVideoFormat),
+        supportedFormats: result.supportedFormats.map(this.mapToOutputFormat),
         recommendedQuality: this.mapToVideoQuality(result.recommendedQuality),
         estimatedProcessingTime: result.estimatedProcessingTime,
-        deviceOptimizations: {
-          preferredEncoder: 'hardware',
-          maxRecommendedResolution: { width: 1920, height: 1080 },
-          thermalThrottling: false,
-        },
+        complexity: 'medium',
+        issues: [],
       };
     } catch (error) {
       throw new ProcessingError(
-        ProcessingErrorType.ANALYSIS_FAILED,
-        `Video analysis failed: ${error.message}`,
+        ProcessingErrorType.UNKNOWN_ERROR,
+        `Video analysis failed: ${(error as Error).message}`,
+        'ANALYSIS_FAILED',
         { filePath, originalError: error }
       );
     }
   }
 
   async pauseConversion(sessionId: string): Promise<void> {
-    // Media3 doesn't support pausing, so we'll need to implement stop/resume pattern
     throw new ProcessingError(
-      ProcessingErrorType.OPERATION_NOT_SUPPORTED,
+      ProcessingErrorType.INVALID_OPERATION,
       'Pause/resume is not supported by Media3 Transformer',
+      'OPERATION_NOT_SUPPORTED',
       { sessionId }
     );
   }
 
   async resumeConversion(sessionId: string): Promise<void> {
-    // Media3 doesn't support pausing, so we'll need to implement stop/resume pattern
     throw new ProcessingError(
-      ProcessingErrorType.OPERATION_NOT_SUPPORTED,
+      ProcessingErrorType.INVALID_OPERATION,
       'Pause/resume is not supported by Media3 Transformer',
+      'OPERATION_NOT_SUPPORTED',
       { sessionId }
     );
   }
@@ -335,7 +323,11 @@ export class Media3VideoProcessor implements VideoProcessorService {
     try {
       const session = this.activeSessions.get(sessionId);
       if (!session) {
-        throw new Error('Session not found');
+        throw new ProcessingError(
+          ProcessingErrorType.SESSION_NOT_FOUND,
+          'Session not found',
+          'SESSION_NOT_FOUND'
+        );
       }
 
       const cancelled = await this.nativeModule.cancelConversion(sessionId);
@@ -345,34 +337,137 @@ export class Media3VideoProcessor implements VideoProcessorService {
         this.activeSessions.delete(sessionId);
       }
     } catch (error) {
+      if (error instanceof ProcessingError) {
+        throw error;
+      }
       throw new ProcessingError(
-        ProcessingErrorType.CANCELLATION_FAILED,
-        `Failed to cancel conversion: ${error.message}`,
-        { sessionId, originalError: error }
+        ProcessingErrorType.UNKNOWN_ERROR,
+        `Failed to cancel conversion: ${(error as Error).message}`,
+        'CANCELLATION_FAILED'
       );
     }
   }
 
-  async getConversionProgress(sessionId: string): Promise<ServiceConversionProgress> {
+  async getSessionStatus(sessionId: string): Promise<ConversionSession> {
     const session = this.activeSessions.get(sessionId);
     if (!session) {
       throw new ProcessingError(
         ProcessingErrorType.SESSION_NOT_FOUND,
         'Conversion session not found',
+        'SESSION_NOT_FOUND',
         { sessionId }
       );
     }
 
-    return session.progress;
+    return session;
   }
 
-  async getConversionResult(sessionId: string): Promise<ConversionResult | null> {
-    const session = this.activeSessions.get(sessionId);
-    if (!session || !session.result) {
-      return null;
+  async getSupportedFormats(deviceCapabilities?: DeviceCapabilities): Promise<OutputFormat[]> {
+    try {
+      const capabilities = await this.nativeModule.getCapabilities();
+      return capabilities.supportedOutputFormats.map(this.mapToOutputFormat);
+    } catch (error) {
+      return [OutputFormat.MP4]; // Fallback to MP4 only
     }
+  }
 
-    return session.result;
+  async getQualityProfiles(): Promise<QualityProfile[]> {
+    return [
+      {
+        quality: VideoQuality.LOW,
+        width: 640,
+        height: 360,
+        bitrate: 500000,
+        frameRate: 30,
+        codecProfile: 'baseline',
+        description: 'Low quality (360p)',
+      },
+      {
+        quality: VideoQuality.SD,
+        width: 854,
+        height: 480,
+        bitrate: 1000000,
+        frameRate: 30,
+        codecProfile: 'main',
+        description: 'Standard definition (480p)',
+      },
+      {
+        quality: VideoQuality.HD,
+        width: 1280,
+        height: 720,
+        bitrate: 2500000,
+        frameRate: 30,
+        codecProfile: 'high',
+        description: 'High definition (720p)',
+      },
+      {
+        quality: VideoQuality.FULL_HD,
+        width: 1920,
+        height: 1080,
+        bitrate: 5000000,
+        frameRate: 30,
+        codecProfile: 'high',
+        description: 'Full HD (1080p)',
+      },
+    ];
+  }
+
+  async getConversionPresets(): Promise<ConversionPreset[]> {
+    return [
+      {
+        id: 'fast',
+        name: 'Fast Conversion',
+        description: 'Optimized for speed',
+        quality: VideoQuality.HD,
+        format: OutputFormat.MP4,
+        processingArgs: ['-preset', 'fast'],
+        speedMultiplier: 1.5,
+        minCapabilityScore: 0.5,
+      },
+      {
+        id: 'balanced',
+        name: 'Balanced',
+        description: 'Balance between speed and quality',
+        quality: VideoQuality.HD,
+        format: OutputFormat.MP4,
+        processingArgs: ['-preset', 'medium'],
+        speedMultiplier: 1.0,
+        minCapabilityScore: 0.6,
+      },
+      {
+        id: 'quality',
+        name: 'High Quality',
+        description: 'Optimized for quality',
+        quality: VideoQuality.FULL_HD,
+        format: OutputFormat.MP4,
+        processingArgs: ['-preset', 'slow'],
+        speedMultiplier: 0.7,
+        minCapabilityScore: 0.8,
+      },
+    ];
+  }
+
+  async estimateProcessingTime(request: ConversionRequest, deviceCapabilities: DeviceCapabilities): Promise<number> {
+    const baseDuration = request.inputFile.metadata.duration;
+    const complexityMultiplier = this.getComplexityMultiplier(request);
+    const deviceMultiplier = 1 / Math.max(deviceCapabilities.processor.cores / 4, 0.5);
+
+    return Math.round(baseDuration * complexityMultiplier * deviceMultiplier);
+  }
+
+  async estimateOutputSize(request: ConversionRequest): Promise<number> {
+    const inputSize = request.inputFile.size;
+    const qualityMultiplier = this.getQualityMultiplier(request.targetQuality);
+
+    return Math.round(inputSize * qualityMultiplier);
+  }
+
+  async cleanup(sessionId?: string): Promise<void> {
+    if (sessionId) {
+      this.activeSessions.delete(sessionId);
+    } else {
+      this.activeSessions.clear();
+    }
   }
 
   getActiveConversions(): ConversionSession[] {
@@ -383,10 +478,10 @@ export class Media3VideoProcessor implements VideoProcessorService {
     return this.deviceCapabilities;
   }
 
-  async validateConversionRequest(request: ConversionRequest): Promise<ValidationResult> {
+  async validateRequest(request: ConversionRequest): Promise<ValidationResult> {
     try {
-      // Basic validation
       const errors: string[] = [];
+      const warnings: string[] = [];
 
       if (!request.inputFile?.path) {
         errors.push('Input file path is required');
@@ -397,21 +492,19 @@ export class Media3VideoProcessor implements VideoProcessorService {
       }
 
       if (request.inputFile?.metadata?.duration > 3600000) { // 1 hour
-        errors.push('Video duration exceeds maximum limit (1 hour)');
+        warnings.push('Video duration exceeds recommended limit (1 hour)');
       }
 
       return {
         isValid: errors.length === 0,
         errors,
-        warnings: [],
-        recommendations: ['Use hardware acceleration for better performance'],
+        warnings,
       };
     } catch (error) {
       return {
         isValid: false,
-        errors: [`Validation failed: ${error.message}`],
+        errors: [`Validation failed: ${(error as Error).message}`],
         warnings: [],
-        recommendations: [],
       };
     }
   }
@@ -427,19 +520,19 @@ export class Media3VideoProcessor implements VideoProcessorService {
   }
 
   async createQualityProfile(settings: any): Promise<QualityProfile> {
-    // Implement quality profile creation based on Media3 capabilities
     throw new ProcessingError(
-      ProcessingErrorType.OPERATION_NOT_SUPPORTED,
+      ProcessingErrorType.INVALID_OPERATION,
       'Custom quality profiles not implemented yet',
+      'OPERATION_NOT_SUPPORTED',
       { settings }
     );
   }
 
   async createConversionPreset(name: string, settings: any): Promise<ConversionPreset> {
-    // Implement conversion preset creation
     throw new ProcessingError(
-      ProcessingErrorType.OPERATION_NOT_SUPPORTED,
+      ProcessingErrorType.INVALID_OPERATION,
       'Custom conversion presets not implemented yet',
+      'OPERATION_NOT_SUPPORTED',
       { name, settings }
     );
   }
@@ -534,8 +627,9 @@ export class Media3VideoProcessor implements VideoProcessorService {
 
     session.state = SessionState.FAILED;
     session.error = new ProcessingError(
-      ProcessingErrorType.PROCESSING_FAILED,
+      ProcessingErrorType.UNKNOWN_ERROR,
       event.error,
+      'PROCESSING_FAILED',
       { errorType: event.errorType }
     );
     session.completedAt = new Date(event.timestamp);
@@ -612,18 +706,49 @@ export class Media3VideoProcessor implements VideoProcessorService {
     }
   }
 
-  private mapToVideoFormat(format: string): VideoFormat {
+  private mapToOutputFormat(format: string): OutputFormat {
     switch (format.toLowerCase()) {
       case 'mp4':
-        return VideoFormat.MP4;
+        return OutputFormat.MP4;
       case 'mov':
-        return VideoFormat.MOV;
+        return OutputFormat.MOV;
       case 'avi':
-        return VideoFormat.AVI;
+        return OutputFormat.AVI;
       case 'mkv':
-        return VideoFormat.MKV;
+        return OutputFormat.MKV;
       default:
-        return VideoFormat.MP4;
+        return OutputFormat.MP4;
+    }
+  }
+
+  private getComplexityMultiplier(request: ConversionRequest): number {
+    let multiplier = 1.0;
+
+    if (request.options?.startTime !== undefined || request.options?.endTime !== undefined) {
+      multiplier *= 1.2; // Trimming adds complexity
+    }
+
+    if (request.options?.cropParams) {
+      multiplier *= 1.3; // Cropping adds complexity
+    }
+
+    return multiplier;
+  }
+
+  private getQualityMultiplier(quality: VideoQuality): number {
+    switch (quality) {
+      case VideoQuality.LOW:
+        return 0.3;
+      case VideoQuality.SD:
+        return 0.5;
+      case VideoQuality.HD:
+        return 0.8;
+      case VideoQuality.FULL_HD:
+        return 1.0;
+      case VideoQuality.UHD_4K:
+        return 2.0;
+      default:
+        return 0.8;
     }
   }
 
@@ -645,12 +770,14 @@ export class Media3VideoProcessor implements VideoProcessorService {
   }
 
   private generateSessionId(): string {
-    return `media3_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `media3_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
   }
 
   // Cleanup
-  destroy(): void {
-    this.eventEmitter.removeAllListeners();
+  async destroy(): Promise<void> {
+    this.eventEmitter.removeAllListeners(this.nativeModule.EVENT_CONVERSION_PROGRESS);
+    this.eventEmitter.removeAllListeners(this.nativeModule.EVENT_CONVERSION_COMPLETE);
+    this.eventEmitter.removeAllListeners(this.nativeModule.EVENT_CONVERSION_ERROR);
     this.eventListeners.clear();
     this.activeSessions.clear();
   }

@@ -85,98 +85,78 @@ describe('DeviceResources Model', () => {
   describe('SystemInfo Interface', () => {
     it('should have all required system information', () => {
       const systemInfo: SystemInfo = {
-        deviceType: DeviceType.PHONE,
         manufacturer: 'Samsung',
         model: 'Galaxy S23',
-        androidVersion: '14',
+        osVersion: '14',
         apiLevel: 34,
-        buildNumber: 'TP1A.220624.014',
-        kernelVersion: '5.15.78-android13-8-g63b2b47b6b0b',
-        totalRam: 8589934592, // 8GB
-        availableRam: 4294967296, // 4GB
+        deviceType: DeviceType.PHONE,
+        architecture: 'arm64-v8a',
         cpuCores: 8,
-        cpuArchitecture: 'arm64-v8a'
+        cpuFrequency: 2840 // 2.84 GHz
       };
 
       expect(systemInfo.deviceType).toBe(DeviceType.PHONE);
       expect(systemInfo.manufacturer).toBe('Samsung');
       expect(systemInfo.model).toBe('Galaxy S23');
-      expect(systemInfo.androidVersion).toBe('14');
+      expect(systemInfo.osVersion).toBe('14');
       expect(systemInfo.apiLevel).toBe(34);
-      expect(systemInfo.buildNumber).toBe('TP1A.220624.014');
-      expect(systemInfo.kernelVersion).toBe('5.15.78-android13-8-g63b2b47b6b0b');
-      expect(systemInfo.totalRam).toBe(8589934592);
-      expect(systemInfo.availableRam).toBe(4294967296);
+      expect(systemInfo.architecture).toBe('arm64-v8a');
       expect(systemInfo.cpuCores).toBe(8);
-      expect(systemInfo.cpuArchitecture).toBe('arm64-v8a');
+      expect(systemInfo.cpuFrequency).toBe(2840);
     });
 
     it('should support optional system features', () => {
       const systemInfo: SystemInfo = {
-        deviceType: DeviceType.TABLET,
         manufacturer: 'Google',
         model: 'Pixel Tablet',
-        androidVersion: '14',
+        osVersion: '14',
         apiLevel: 34,
-        buildNumber: 'TD1A.220804.031',
-        kernelVersion: '5.15.78-android13-8-g63b2b47b6b0b',
-        totalRam: 8589934592,
-        availableRam: 6442450944,
+        deviceType: DeviceType.TABLET,
+        architecture: 'arm64-v8a',
         cpuCores: 8,
-        cpuArchitecture: 'arm64-v8a',
-        hasHardwareAcceleration: true,
-        supportedAbis: ['arm64-v8a', 'armeabi-v7a'],
-        screenDensity: 280,
-        screenWidth: 2560,
-        screenHeight: 1600
+        cpuFrequency: 2400, // 2.4 GHz
+        gpuRenderer: 'Adreno 740'
       };
 
-      expect(systemInfo.hasHardwareAcceleration).toBe(true);
-      expect(systemInfo.supportedAbis).toContain('arm64-v8a');
-      expect(systemInfo.screenDensity).toBe(280);
-      expect(systemInfo.screenWidth).toBe(2560);
-      expect(systemInfo.screenHeight).toBe(1600);
+      expect(systemInfo.deviceType).toBe(DeviceType.TABLET);
+      expect(systemInfo.architecture).toBe('arm64-v8a');
+      expect(systemInfo.gpuRenderer).toBe('Adreno 740');
+      expect(systemInfo.cpuFrequency).toBe(2400);
     });
   });
 
   describe('StorageInfo Interface', () => {
     it('should track storage usage accurately', () => {
       const storageInfo: StorageInfo = {
-        totalInternalStorage: 134217728000, // 128GB
-        availableInternalStorage: 67108864000, // 64GB
-        totalExternalStorage: 268435456000, // 256GB
-        availableExternalStorage: 134217728000, // 128GB
-        appStorageUsed: 1073741824, // 1GB
-        tempStorageUsed: 268435456, // 256MB
-        cacheStorageUsed: 134217728 // 128MB
+        totalStorage: 134217728000, // 128GB
+        availableStorage: 67108864000, // 64GB
+        usedStorage: 67108864000, // 64GB used
+        usagePercentage: 0.5,
+        isCriticallyLow: false,
+        appStorage: 1073741824 // 1GB
       };
 
-      expect(storageInfo.totalInternalStorage).toBe(134217728000);
-      expect(storageInfo.availableInternalStorage).toBe(67108864000);
-      expect(storageInfo.totalExternalStorage).toBe(268435456000);
-      expect(storageInfo.availableExternalStorage).toBe(134217728000);
-      expect(storageInfo.appStorageUsed).toBe(1073741824);
-      expect(storageInfo.tempStorageUsed).toBe(268435456);
-      expect(storageInfo.cacheStorageUsed).toBe(134217728);
+      expect(storageInfo.totalStorage).toBe(134217728000);
+      expect(storageInfo.availableStorage).toBe(67108864000);
+      expect(storageInfo.usedStorage).toBe(67108864000);
+      expect(storageInfo.usagePercentage).toBe(0.5);
+      expect(storageInfo.isCriticallyLow).toBe(false);
+      expect(storageInfo.appStorage).toBe(1073741824);
     });
 
-    it('should support optional storage details', () => {
+    it('should support storage state checks', () => {
       const storageInfo: StorageInfo = {
-        totalInternalStorage: 67108864000,
-        availableInternalStorage: 33554432000,
-        totalExternalStorage: 0,
-        availableExternalStorage: 0,
-        appStorageUsed: 536870912,
-        tempStorageUsed: 134217728,
-        cacheStorageUsed: 67108864,
-        lowStorageWarning: true,
-        storageType: 'ufs',
-        isRemovableStorage: false
+        totalStorage: 67108864000,
+        availableStorage: 33554432000,
+        usedStorage: 33554432000,
+        usagePercentage: 0.5,
+        isCriticallyLow: true,
+        appStorage: 536870912
       };
 
-      expect(storageInfo.lowStorageWarning).toBe(true);
-      expect(storageInfo.storageType).toBe('ufs');
-      expect(storageInfo.isRemovableStorage).toBe(false);
+      expect(storageInfo.isCriticallyLow).toBe(true);
+      expect(storageInfo.usagePercentage).toBe(0.5);
+      expect(storageInfo.appStorage).toBe(536870912);
     });
   });
 
@@ -186,38 +166,32 @@ describe('DeviceResources Model', () => {
         totalRam: 8589934592, // 8GB
         availableRam: 4294967296, // 4GB
         usedRam: 4294967296, // 4GB
-        appMemoryUsage: 536870912, // 512MB
-        freeMemory: 3758096384, // ~3.5GB
-        lowMemoryWarning: false,
-        memoryPressure: 0.5
+        usagePercentage: 0.5,
+        lowMemoryThreshold: 1073741824, // 1GB
+        isLowMemory: false
       };
 
       expect(memoryInfo.totalRam).toBe(8589934592);
       expect(memoryInfo.availableRam).toBe(4294967296);
       expect(memoryInfo.usedRam).toBe(4294967296);
-      expect(memoryInfo.appMemoryUsage).toBe(536870912);
-      expect(memoryInfo.freeMemory).toBe(3758096384);
-      expect(memoryInfo.lowMemoryWarning).toBe(false);
-      expect(memoryInfo.memoryPressure).toBe(0.5);
+      expect(memoryInfo.usagePercentage).toBe(0.5);
+      expect(memoryInfo.lowMemoryThreshold).toBe(1073741824);
+      expect(memoryInfo.isLowMemory).toBe(false);
     });
 
-    it('should support optional memory details', () => {
+    it('should support low memory detection', () => {
       const memoryInfo: MemoryInfo = {
         totalRam: 4294967296,
-        availableRam: 2147483648,
-        usedRam: 2147483648,
-        appMemoryUsage: 805306368,
-        freeMemory: 1342177280,
-        lowMemoryWarning: true,
-        memoryPressure: 0.8,
-        gcFrequency: 45,
-        heapSize: 268435456,
-        heapUsed: 201326592
+        availableRam: 536870912, // Low available memory
+        usedRam: 3758096384,
+        usagePercentage: 0.875, // 87.5% used
+        lowMemoryThreshold: 1073741824, // 1GB threshold
+        isLowMemory: true
       };
 
-      expect(memoryInfo.gcFrequency).toBe(45);
-      expect(memoryInfo.heapSize).toBe(268435456);
-      expect(memoryInfo.heapUsed).toBe(201326592);
+      expect(memoryInfo.isLowMemory).toBe(true);
+      expect(memoryInfo.usagePercentage).toBe(0.875);
+      expect(memoryInfo.availableRam).toBeLessThan(memoryInfo.lowMemoryThreshold);
     });
   });
 
@@ -226,35 +200,27 @@ describe('DeviceResources Model', () => {
       const thermalState: ThermalState = {
         level: ThermalLevel.LIGHT,
         temperature: 38.5,
-        maxTemperature: 85.0,
-        throttlingActive: false,
+        isThrottling: false,
         timestamp: new Date('2025-09-19T10:30:00Z')
       };
 
       expect(thermalState.level).toBe(ThermalLevel.LIGHT);
       expect(thermalState.temperature).toBe(38.5);
-      expect(thermalState.maxTemperature).toBe(85.0);
-      expect(thermalState.throttlingActive).toBe(false);
+      expect(thermalState.isThrottling).toBe(false);
       expect(thermalState.timestamp).toBeInstanceOf(Date);
     });
 
-    it('should support optional thermal monitoring', () => {
+    it('should detect thermal throttling', () => {
       const thermalState: ThermalState = {
         level: ThermalLevel.MODERATE,
         temperature: 65.2,
-        maxTemperature: 85.0,
-        throttlingActive: true,
-        timestamp: new Date(),
-        cpuTemperature: 68.0,
-        gpuTemperature: 62.5,
-        batteryTemperature: 35.8,
-        ambientTemperature: 24.0
+        isThrottling: true,
+        timestamp: new Date()
       };
 
-      expect(thermalState.cpuTemperature).toBe(68.0);
-      expect(thermalState.gpuTemperature).toBe(62.5);
-      expect(thermalState.batteryTemperature).toBe(35.8);
-      expect(thermalState.ambientTemperature).toBe(24.0);
+      expect(thermalState.level).toBe(ThermalLevel.MODERATE);
+      expect(thermalState.temperature).toBe(65.2);
+      expect(thermalState.isThrottling).toBe(true);
     });
   });
 
@@ -264,40 +230,33 @@ describe('DeviceResources Model', () => {
         level: 0.85, // 85%
         state: BatteryState.DISCHARGING,
         isCharging: false,
+        health: 0.95, // 95% health
         temperature: 28.5,
-        voltage: 3.85,
-        lowPowerMode: false,
-        estimatedTimeRemaining: 14400 // 4 hours
+        timeToEmpty: 240 // 4 hours in minutes
       };
 
       expect(batteryInfo.level).toBe(0.85);
       expect(batteryInfo.state).toBe(BatteryState.DISCHARGING);
       expect(batteryInfo.isCharging).toBe(false);
+      expect(batteryInfo.health).toBe(0.95);
       expect(batteryInfo.temperature).toBe(28.5);
-      expect(batteryInfo.voltage).toBe(3.85);
-      expect(batteryInfo.lowPowerMode).toBe(false);
-      expect(batteryInfo.estimatedTimeRemaining).toBe(14400);
+      expect(batteryInfo.timeToEmpty).toBe(240);
     });
 
-    it('should support optional battery details', () => {
+    it('should support charging state tracking', () => {
       const batteryInfo: BatteryInfo = {
         level: 0.25,
         state: BatteryState.CHARGING,
         isCharging: true,
+        health: 0.85, // 85% health
         temperature: 32.0,
-        voltage: 4.2,
-        lowPowerMode: true,
-        estimatedTimeRemaining: 3600,
-        chargingType: 'fast',
-        capacity: 4000,
-        cycleCount: 450,
-        health: 'good'
+        timeToFull: 60 // 1 hour to full charge
       };
 
-      expect(batteryInfo.chargingType).toBe('fast');
-      expect(batteryInfo.capacity).toBe(4000);
-      expect(batteryInfo.cycleCount).toBe(450);
-      expect(batteryInfo.health).toBe('good');
+      expect(batteryInfo.isCharging).toBe(true);
+      expect(batteryInfo.state).toBe(BatteryState.CHARGING);
+      expect(batteryInfo.health).toBe(0.85);
+      expect(batteryInfo.timeToFull).toBe(60);
     });
   });
 
@@ -307,37 +266,30 @@ describe('DeviceResources Model', () => {
         type: NetworkType.WIFI,
         isConnected: true,
         isMetered: false,
-        signalStrength: 0.8,
-        bandwidth: 100000000, // 100 Mbps
-        timestamp: new Date('2025-09-19T10:30:00Z')
+        estimatedSpeed: 100, // 100 Mbps
+        signalStrength: 0.8
       };
 
       expect(networkInfo.type).toBe(NetworkType.WIFI);
       expect(networkInfo.isConnected).toBe(true);
       expect(networkInfo.isMetered).toBe(false);
+      expect(networkInfo.estimatedSpeed).toBe(100);
       expect(networkInfo.signalStrength).toBe(0.8);
-      expect(networkInfo.bandwidth).toBe(100000000);
-      expect(networkInfo.timestamp).toBeInstanceOf(Date);
     });
 
-    it('should support optional network details', () => {
+    it('should track cellular network state', () => {
       const networkInfo: NetworkInfo = {
         type: NetworkType.CELLULAR,
         isConnected: true,
         isMetered: true,
-        signalStrength: 0.6,
-        bandwidth: 50000000,
-        timestamp: new Date(),
-        carrierName: 'Verizon',
-        networkGeneration: '5G',
-        roaming: false,
-        dataUsage: 1073741824 // 1GB
+        estimatedSpeed: 50, // 50 Mbps
+        signalStrength: 0.6
       };
 
-      expect(networkInfo.carrierName).toBe('Verizon');
-      expect(networkInfo.networkGeneration).toBe('5G');
-      expect(networkInfo.roaming).toBe(false);
-      expect(networkInfo.dataUsage).toBe(1073741824);
+      expect(networkInfo.type).toBe(NetworkType.CELLULAR);
+      expect(networkInfo.isMetered).toBe(true);
+      expect(networkInfo.estimatedSpeed).toBe(50);
+      expect(networkInfo.signalStrength).toBe(0.6);
     });
   });
 
@@ -345,190 +297,173 @@ describe('DeviceResources Model', () => {
     it('should define processing constraints', () => {
       const limits: ProcessingLimits = {
         maxConcurrentJobs: 2,
-        maxMemoryPerJob: 1073741824, // 1GB
-        maxCpuUsage: 0.8, // 80%
-        maxThermalLevel: ThermalLevel.MODERATE,
-        minBatteryLevel: 0.2, // 20%
-        requiresCharging: false,
-        pauseOnLowBattery: true
+        maxResolution: { width: 1920, height: 1080 },
+        maxDuration: 3600, // 1 hour
+        maxFileSize: 2147483648, // 2GB
+        maxBitrate: 10000000, // 10 Mbps
+        hardwareAcceleration: true
       };
 
       expect(limits.maxConcurrentJobs).toBe(2);
-      expect(limits.maxMemoryPerJob).toBe(1073741824);
-      expect(limits.maxCpuUsage).toBe(0.8);
-      expect(limits.maxThermalLevel).toBe(ThermalLevel.MODERATE);
-      expect(limits.minBatteryLevel).toBe(0.2);
-      expect(limits.requiresCharging).toBe(false);
-      expect(limits.pauseOnLowBattery).toBe(true);
+      expect(limits.maxResolution.width).toBe(1920);
+      expect(limits.maxResolution.height).toBe(1080);
+      expect(limits.maxDuration).toBe(3600);
+      expect(limits.maxFileSize).toBe(2147483648);
+      expect(limits.maxBitrate).toBe(10000000);
+      expect(limits.hardwareAcceleration).toBe(true);
     });
 
-    it('should support optional processing features', () => {
+    it('should support limited processing capabilities', () => {
       const limits: ProcessingLimits = {
         maxConcurrentJobs: 1,
-        maxMemoryPerJob: 536870912,
-        maxCpuUsage: 0.6,
-        maxThermalLevel: ThermalLevel.LIGHT,
-        minBatteryLevel: 0.3,
-        requiresCharging: true,
-        pauseOnLowBattery: true,
-        backgroundProcessing: false,
-        networkRequired: false,
-        wifiOnlyProcessing: true
+        maxResolution: { width: 1280, height: 720 }, // Lower resolution limit
+        maxDuration: 1800, // 30 minutes
+        maxFileSize: 1073741824, // 1GB
+        maxBitrate: 5000000, // 5 Mbps
+        hardwareAcceleration: false
       };
 
-      expect(limits.backgroundProcessing).toBe(false);
-      expect(limits.networkRequired).toBe(false);
-      expect(limits.wifiOnlyProcessing).toBe(true);
+      expect(limits.maxConcurrentJobs).toBe(1);
+      expect(limits.maxResolution.width).toBe(1280);
+      expect(limits.hardwareAcceleration).toBe(false);
+      expect(limits.maxDuration).toBe(1800);
     });
   });
 
   describe('DeviceCapabilities Interface', () => {
     it('should assess complete device capabilities', () => {
       const capabilities: DeviceCapabilities = {
-        supportsHardwareAcceleration: true,
-        supportsParallelProcessing: true,
-        maxVideoResolution: { width: 4096, height: 2160 }, // 4K
-        supportedCodecs: ['h264', 'h265', 'vp9', 'av1'],
-        recommendedSettings: {
+        processingPower: 0.85,
+        memoryScore: 0.80,
+        storageScore: 0.75,
+        batteryScore: 0.90,
+        thermalScore: 0.85,
+        overallScore: 0.83,
+        recommendedQuality: 'high',
+        limits: {
           maxConcurrentJobs: 2,
-          optimalMemoryUsage: 1073741824,
-          recommendedQuality: 'high',
-          batteryOptimized: true
-        },
-        performanceScore: 8.5,
-        lastAssessed: new Date('2025-09-19T10:00:00Z')
+          maxResolution: { width: 4096, height: 2160 },
+          maxDuration: 7200, // 2 hours
+          maxFileSize: 4294967296, // 4GB
+          maxBitrate: 20000000, // 20 Mbps
+          hardwareAcceleration: true
+        }
       };
 
-      expect(capabilities.supportsHardwareAcceleration).toBe(true);
-      expect(capabilities.supportsParallelProcessing).toBe(true);
-      expect(capabilities.maxVideoResolution.width).toBe(4096);
-      expect(capabilities.maxVideoResolution.height).toBe(2160);
-      expect(capabilities.supportedCodecs).toContain('h264');
-      expect(capabilities.recommendedSettings.maxConcurrentJobs).toBe(2);
-      expect(capabilities.performanceScore).toBe(8.5);
-      expect(capabilities.lastAssessed).toBeInstanceOf(Date);
+      expect(capabilities.processingPower).toBe(0.85);
+      expect(capabilities.overallScore).toBe(0.83);
+      expect(capabilities.recommendedQuality).toBe('high');
+      expect(capabilities.limits.maxConcurrentJobs).toBe(2);
+      expect(capabilities.limits.hardwareAcceleration).toBe(true);
     });
 
-    it('should support optional capability details', () => {
+    it('should support lower capability devices', () => {
       const capabilities: DeviceCapabilities = {
-        supportsHardwareAcceleration: false,
-        supportsParallelProcessing: false,
-        maxVideoResolution: { width: 1920, height: 1080 },
-        supportedCodecs: ['h264'],
-        recommendedSettings: {
+        processingPower: 0.50,
+        memoryScore: 0.45,
+        storageScore: 0.60,
+        batteryScore: 0.70,
+        thermalScore: 0.55,
+        overallScore: 0.56,
+        recommendedQuality: 'medium',
+        limits: {
           maxConcurrentJobs: 1,
-          optimalMemoryUsage: 536870912,
-          recommendedQuality: 'medium',
-          batteryOptimized: true
-        },
-        performanceScore: 5.2,
-        lastAssessed: new Date(),
-        gpuModel: 'Adreno 640',
-        encoderCapabilities: ['h264_hardware', 'h265_software'],
-        thermalLimitations: true,
-        powerEfficiencyRating: 6.8
+          maxResolution: { width: 1920, height: 1080 },
+          maxDuration: 3600, // 1 hour
+          maxFileSize: 1073741824, // 1GB
+          maxBitrate: 8000000, // 8 Mbps
+          hardwareAcceleration: false
+        }
       };
 
-      expect(capabilities.gpuModel).toBe('Adreno 640');
-      expect(capabilities.encoderCapabilities).toContain('h264_hardware');
-      expect(capabilities.thermalLimitations).toBe(true);
-      expect(capabilities.powerEfficiencyRating).toBe(6.8);
+      expect(capabilities.processingPower).toBe(0.50);
+      expect(capabilities.recommendedQuality).toBe('medium');
+      expect(capabilities.limits.hardwareAcceleration).toBe(false);
+      expect(capabilities.overallScore).toBe(0.56);
     });
   });
 
   describe('DeviceResources Interface', () => {
     it('should aggregate all device resource information', () => {
       const deviceResources: DeviceResources = {
-        systemInfo: {
-          deviceType: DeviceType.PHONE,
+        system: {
           manufacturer: 'Samsung',
           model: 'Galaxy S23',
-          androidVersion: '14',
+          osVersion: '14',
           apiLevel: 34,
-          buildNumber: 'TP1A.220624.014',
-          kernelVersion: '5.15.78-android13-8-g63b2b47b6b0b',
-          totalRam: 8589934592,
-          availableRam: 4294967296,
+          deviceType: DeviceType.PHONE,
+          architecture: 'arm64-v8a',
           cpuCores: 8,
-          cpuArchitecture: 'arm64-v8a'
+          cpuFrequency: 2840
         },
-        storageInfo: {
-          totalInternalStorage: 134217728000,
-          availableInternalStorage: 67108864000,
-          totalExternalStorage: 0,
-          availableExternalStorage: 0,
-          appStorageUsed: 1073741824,
-          tempStorageUsed: 268435456,
-          cacheStorageUsed: 134217728
+        storage: {
+          totalStorage: 134217728000,
+          availableStorage: 67108864000,
+          usedStorage: 67108864000,
+          usagePercentage: 0.5,
+          isCriticallyLow: false,
+          appStorage: 1073741824
         },
-        memoryInfo: {
+        memory: {
           totalRam: 8589934592,
           availableRam: 4294967296,
           usedRam: 4294967296,
-          appMemoryUsage: 536870912,
-          freeMemory: 3758096384,
-          lowMemoryWarning: false,
-          memoryPressure: 0.5
+          usagePercentage: 0.5,
+          lowMemoryThreshold: 1073741824,
+          isLowMemory: false
         },
-        thermalState: {
+        thermal: {
           level: ThermalLevel.NORMAL,
           temperature: 35.0,
-          maxTemperature: 85.0,
-          throttlingActive: false,
+          isThrottling: false,
           timestamp: new Date()
         },
-        batteryInfo: {
+        battery: {
           level: 0.75,
           state: BatteryState.DISCHARGING,
           isCharging: false,
+          health: 0.95,
           temperature: 28.0,
-          voltage: 3.8,
-          lowPowerMode: false,
-          estimatedTimeRemaining: 18000
+          timeToEmpty: 300
         },
-        networkInfo: {
+        network: {
           type: NetworkType.WIFI,
           isConnected: true,
           isMetered: false,
-          signalStrength: 0.9,
-          bandwidth: 100000000,
-          timestamp: new Date()
+          estimatedSpeed: 100,
+          signalStrength: 0.9
         },
         capabilities: {
-          supportsHardwareAcceleration: true,
-          supportsParallelProcessing: true,
-          maxVideoResolution: { width: 4096, height: 2160 },
-          supportedCodecs: ['h264', 'h265', 'vp9'],
-          recommendedSettings: {
+          processingPower: 0.85,
+          memoryScore: 0.80,
+          storageScore: 0.75,
+          batteryScore: 0.90,
+          thermalScore: 0.85,
+          overallScore: 0.83,
+          recommendedQuality: 'high',
+          limits: {
             maxConcurrentJobs: 2,
-            optimalMemoryUsage: 1073741824,
-            recommendedQuality: 'high',
-            batteryOptimized: true
-          },
-          performanceScore: 8.5,
-          lastAssessed: new Date()
+            maxResolution: { width: 4096, height: 2160 },
+            maxDuration: 7200,
+            maxFileSize: 4294967296,
+            maxBitrate: 20000000,
+            hardwareAcceleration: true
+          }
         },
-        processingLimits: {
-          maxConcurrentJobs: 2,
-          maxMemoryPerJob: 1073741824,
-          maxCpuUsage: 0.8,
-          maxThermalLevel: ThermalLevel.MODERATE,
-          minBatteryLevel: 0.2,
-          requiresCharging: false,
-          pauseOnLowBattery: true
-        },
-        lastUpdated: new Date('2025-09-19T10:30:00Z')
+        timestamp: new Date('2025-09-19T10:30:00Z'),
+        isSuitableForProcessing: true,
+        warnings: []
       };
 
-      expect(deviceResources.systemInfo.deviceType).toBe(DeviceType.PHONE);
-      expect(deviceResources.storageInfo.totalInternalStorage).toBe(134217728000);
-      expect(deviceResources.memoryInfo.totalRam).toBe(8589934592);
-      expect(deviceResources.thermalState.level).toBe(ThermalLevel.NORMAL);
-      expect(deviceResources.batteryInfo.level).toBe(0.75);
-      expect(deviceResources.networkInfo.type).toBe(NetworkType.WIFI);
-      expect(deviceResources.capabilities.supportsHardwareAcceleration).toBe(true);
-      expect(deviceResources.processingLimits.maxConcurrentJobs).toBe(2);
-      expect(deviceResources.lastUpdated).toBeInstanceOf(Date);
+      expect(deviceResources.system.deviceType).toBe(DeviceType.PHONE);
+      expect(deviceResources.storage.totalStorage).toBe(134217728000);
+      expect(deviceResources.memory.totalRam).toBe(8589934592);
+      expect(deviceResources.thermal.level).toBe(ThermalLevel.NORMAL);
+      expect(deviceResources.battery.level).toBe(0.75);
+      expect(deviceResources.network.type).toBe(NetworkType.WIFI);
+      expect(deviceResources.capabilities.overallScore).toBe(0.83);
+      expect(deviceResources.isSuitableForProcessing).toBe(true);
+      expect(deviceResources.timestamp).toBeInstanceOf(Date);
     });
   });
 

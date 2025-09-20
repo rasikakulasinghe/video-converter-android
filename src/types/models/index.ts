@@ -85,3 +85,19 @@ export type {
 export { ErrorSeverity } from './ConversionResult';
 
 export type { VideoValidationResult } from './VideoFile';
+
+// Export DeviceCapabilities types
+export type {
+  DeviceCapabilities,
+  BatteryInfo,
+  MemoryInfo,
+  StorageInfo,
+  ProcessorInfo,
+  DevicePerformance,
+  ProcessingCapability,
+  QualityRecommendation,
+  SuitabilityResult,
+  StorageRecommendation,
+  PauseRecommendation,
+  ValidationResult
+} from './DeviceCapabilities';

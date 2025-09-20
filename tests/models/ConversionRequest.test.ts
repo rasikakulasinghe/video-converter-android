@@ -6,7 +6,7 @@ import {
   validateOutputPath,
   getDefaultConversionOptions 
 } from '../../src/types/models/ConversionRequest';
-import { VideoFile, VideoQuality } from '../../src/types/models';
+import { VideoFile, VideoQuality, VideoFormat } from '../../src/types/models';
 
 describe('ConversionRequest Model', () => {
   // Mock VideoFile for testing
@@ -16,7 +16,9 @@ describe('ConversionRequest Model', () => {
     path: '/storage/emulated/0/DCIM/Camera/sample-video.mp4',
     size: 52428800, // 50MB
     mimeType: 'video/mp4',
+    format: VideoFormat.MP4,
     createdAt: new Date('2025-09-17T10:00:00Z'),
+    modifiedAt: new Date('2025-09-17T10:05:00Z'),
     metadata: {
       duration: 120000, // 2 minutes
       width: 1920,
@@ -24,6 +26,7 @@ describe('ConversionRequest Model', () => {
       frameRate: 30,
       bitrate: 5000000,
       codec: 'h264',
+      codecName: 'H.264',
       audioCodec: 'aac',
       audioBitrate: 128000,
       audioSampleRate: 44100,
@@ -53,7 +56,7 @@ describe('ConversionRequest Model', () => {
           },
         },
         createdAt: new Date(),
-        priority: 'normal',
+        targetQuality: VideoQuality.HD,
       };
 
       expect(mockRequest).toHaveProperty('id');
@@ -77,7 +80,7 @@ describe('ConversionRequest Model', () => {
       };
 
       expect(minimalRequest.options).toBeUndefined();
-      expect(minimalRequest.priority).toBeUndefined();
+      expect(minimalRequest.targetQuality).toBeDefined();
     });
 
     it('should support different output formats', () => {
@@ -336,7 +339,6 @@ describe('ConversionRequest Model', () => {
       const estimatedTime = estimateConversionTime(request);
       const fullVideoEstimate = estimateConversionTime({
         ...request,
-        options: undefined,
       });
 
       // Trimmed video should take less time
@@ -364,7 +366,6 @@ describe('ConversionRequest Model', () => {
       const estimatedTime = estimateConversionTime(request);
       const noCropEstimate = estimateConversionTime({
         ...request,
-        options: undefined,
       });
 
       // Cropping should add processing time
@@ -488,7 +489,6 @@ describe('ConversionRequest Model', () => {
           outputPath: '/path/output.mp4',
           targetQuality: VideoQuality.HD,
           outputFormat: OutputFormat.MP4,
-          priority,
           createdAt: new Date(),
         };
 

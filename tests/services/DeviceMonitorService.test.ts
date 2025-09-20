@@ -694,7 +694,7 @@ describe('DeviceMonitorService Contract', () => {
       
       expect(result.config.interval).toBe(1000);
       expect(result.config.enableAlerts).toBe(false);
-      expect(result.config.customSettings?.logToFile).toBe(true);
+      expect(result.config.customSettings!.logToFile).toBe(true);
     });
   });
 
@@ -741,10 +741,10 @@ describe('DeviceMonitorService Contract', () => {
       const results = await mockDeviceMonitor.getOptimizationRecommendations('video_processing');
       
       expect(results).toHaveLength(2);
-      expect(results[0].type).toBe(OptimizationType.PERFORMANCE);
-      expect(results[0].priority).toBe('high');
-      expect(results[0].estimatedBenefit?.performanceGain).toBe(60);
-      expect(results[1].type).toBe(OptimizationType.POWER);
+      expect(results[0]!.type).toBe(OptimizationType.PERFORMANCE);
+      expect(results[0]!.priority).toBe('high');
+      expect(results[0]!.estimatedBenefit?.performanceGain).toBe(60);
+      expect(results[1]!.type).toBe(OptimizationType.POWER);
     });
 
     it('should handle no optimization recommendations', async () => {
@@ -854,7 +854,6 @@ describe('DeviceMonitorService Contract', () => {
         threshold: 85.0,
         recommendation: 'Consider reducing video processing quality or closing other apps',
         isActive: true,
-        acknowledgedAt: undefined,
       };
 
       (mockDeviceMonitor.getActiveAlerts as jest.Mock).mockResolvedValue([mockAlert]);
@@ -862,10 +861,10 @@ describe('DeviceMonitorService Contract', () => {
       const alerts = await mockDeviceMonitor.getActiveAlerts();
       
       expect(alerts).toHaveLength(1);
-      expect(alerts[0].type).toBe(ResourceAlertType.HIGH_CPU_USAGE);
-      expect(alerts[0].severity).toBe(ResourceAlertSeverity.WARNING);
-      expect(alerts[0].value).toBe(87.5);
-      expect(alerts[0].isActive).toBe(true);
+      expect(alerts[0]!.type).toBe(ResourceAlertType.HIGH_CPU_USAGE);
+      expect(alerts[0]!.severity).toBe(ResourceAlertSeverity.WARNING);
+      expect(alerts[0]!.value).toBe(87.5);
+      expect(alerts[0]!.isActive).toBe(true);
     });
 
     it('should handle critical alerts', async () => {
@@ -879,16 +878,15 @@ describe('DeviceMonitorService Contract', () => {
         threshold: ThermalState.SERIOUS,
         recommendation: 'Stop all processing immediately and let device cool down',
         isActive: true,
-        acknowledgedAt: undefined,
       };
 
       (mockDeviceMonitor.getActiveAlerts as jest.Mock).mockResolvedValue([criticalAlert]);
 
       const alerts = await mockDeviceMonitor.getActiveAlerts();
       
-      expect(alerts[0].severity).toBe(ResourceAlertSeverity.CRITICAL);
-      expect(alerts[0].type).toBe(ResourceAlertType.THERMAL_EMERGENCY);
-      expect(alerts[0].recommendation).toContain('Stop all processing immediately');
+      expect(alerts[0]!.severity).toBe(ResourceAlertSeverity.CRITICAL);
+      expect(alerts[0]!.type).toBe(ResourceAlertType.THERMAL_EMERGENCY);
+      expect(alerts[0]!.recommendation).toContain('Stop all processing immediately');
     });
   });
 });

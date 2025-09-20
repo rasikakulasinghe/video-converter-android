@@ -1,4 +1,4 @@
-import { VideoFile, VideoMetadata, VideoQuality } from '../../src/types/models';
+import { VideoFile, VideoMetadata, VideoQuality, VideoFormat } from '../../src/types/models';
 import { validateVideoFile, getVideoQuality, isVideoSupported } from '../../src/types/models/VideoFile';
 
 describe('VideoFile Model', () => {
@@ -10,7 +10,9 @@ describe('VideoFile Model', () => {
         path: '/storage/emulated/0/DCIM/Camera/sample-video.mp4',
         size: 52428800, // 50MB
         mimeType: 'video/mp4',
+        format: VideoFormat.MP4,
         createdAt: new Date('2025-09-17T10:00:00Z'),
+        modifiedAt: new Date('2025-09-17T10:05:00Z'),
         metadata: {
           duration: 120000, // 2 minutes in ms
           width: 1920,
@@ -18,6 +20,7 @@ describe('VideoFile Model', () => {
           frameRate: 30,
           bitrate: 5000000, // 5 Mbps
           codec: 'h264',
+          codecName: 'H.264',
           audioCodec: 'aac',
           audioBitrate: 128000,
           audioSampleRate: 44100,
@@ -47,7 +50,9 @@ describe('VideoFile Model', () => {
         path: '/path/to/minimal.mp4',
         size: 1024000,
         mimeType: 'video/mp4',
+        format: VideoFormat.MP4,
         createdAt: new Date(),
+        modifiedAt: new Date(),
         metadata: {
           duration: 30000,
           width: 1280,
@@ -55,6 +60,7 @@ describe('VideoFile Model', () => {
           frameRate: 30,
           bitrate: 2000000,
           codec: 'h264',
+          codecName: 'H.264',
         },
       };
 
@@ -139,6 +145,7 @@ describe('VideoFile Model', () => {
       const unsupportedFile = {
         ...validVideoFile,
         mimeType: 'video/webm',
+        format: VideoFormat.WEBM,
       } as VideoFile;
 
       const result = validateVideoFile(unsupportedFile);
@@ -358,7 +365,9 @@ describe('VideoFile Model', () => {
         path: '/path/to/small.mp4',
         size: 1024, // 1KB - minimum size
         mimeType: 'video/mp4',
+        format: VideoFormat.MP4,
         createdAt: new Date(),
+        modifiedAt: new Date(),
         metadata: {
           duration: 1000, // 1 second
           width: 320,
@@ -366,6 +375,7 @@ describe('VideoFile Model', () => {
           frameRate: 15,
           bitrate: 8000, // Very low bitrate
           codec: 'h264',
+          codecName: 'H.264',
         },
       };
 
@@ -380,7 +390,9 @@ describe('VideoFile Model', () => {
         path: '/path/to/max-size.mp4',
         size: 4294967296, // 4GB - maximum allowed
         mimeType: 'video/mp4',
+        format: VideoFormat.MP4,
         createdAt: new Date(),
+        modifiedAt: new Date(),
         metadata: {
           duration: 3600000, // 1 hour - maximum duration
           width: 3840,
@@ -388,6 +400,7 @@ describe('VideoFile Model', () => {
           frameRate: 60,
           bitrate: 100000000, // High bitrate
           codec: 'h264',
+          codecName: 'H.264',
         },
       };
 
@@ -410,6 +423,7 @@ describe('VideoFile Model', () => {
           frameRate: 30,
           bitrate: 2000000,
           codec: 'h264',
+          codecName: 'H.264',
         },
       };
 

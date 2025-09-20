@@ -1,4 +1,4 @@
-import { 
+import {
   VideoProcessorService,
   ConversionSession,
   ConversionProgress,
@@ -6,7 +6,6 @@ import {
   ProcessingOptions,
   ConversionEventType,
   ConversionEvent,
-  FFmpegCommand,
   VideoAnalysisResult,
   ConversionPreset,
   QualityProfile,
@@ -14,13 +13,13 @@ import {
   ProcessingErrorType,
   SessionState
 } from '../../src/services/VideoProcessorService';
-import { 
-  ConversionRequest, 
-  ConversionResult, 
-  VideoFile, 
+import {
+  ConversionRequest,
+  ConversionResult,
+  VideoFile,
+  VideoFormat,
   VideoQuality,
   OutputFormat,
-  ConversionPriority,
   ConversionStatus
 } from '../../src/types/models';
 import { DeviceCapabilities } from '../../src/types/models';
@@ -34,17 +33,21 @@ describe('VideoProcessorService Contract', () => {
   beforeEach(() => {
     // Mock device capabilities
     mockDeviceCapabilities = {
-      id: 'test-device-001',
-      deviceModel: 'Test Device',
-      androidVersion: '13',
-      apiLevel: 33,
-      architecture: 'arm64-v8a',
-      lastUpdated: new Date(),
-      battery: { level: 0.8, isCharging: false, health: 'good', temperature: 30.0, voltage: 3.8, capacity: 4000 },
-      memory: { totalRam: 8589934592, availableRam: 6442450944, usedRam: 2147483648, totalStorage: 137438953472, availableStorage: 68719476736, usedStorage: 68719476736, isLowMemory: false },
-      thermal: { state: 'normal' as any, temperature: 30.0, throttleLevel: 0, maxSafeTemperature: 45.0 },
-      processor: { cores: 8, maxFrequency: 2800, currentFrequency: 2400, usage: 40.0, architecture: 'ARM Cortex-A78' },
-      performance: { benchmark: 750000, videoProcessingScore: 85.0, thermalEfficiency: 87.0, batteryEfficiency: 83.0 },
+      processingPower: 0.85,
+      memoryScore: 0.80,
+      storageScore: 0.75,
+      batteryScore: 0.90,
+      thermalScore: 0.85,
+      overallScore: 0.83,
+      recommendedQuality: 'high',
+      limits: {
+        maxConcurrentJobs: 2,
+        maxResolution: { width: 1920, height: 1080 },
+        maxDuration: 3600,
+        maxFileSize: 2147483648,
+        maxBitrate: 10000000,
+        hardwareAcceleration: true
+      }
     };
 
     // Mock video file
@@ -54,8 +57,9 @@ describe('VideoProcessorService Contract', () => {
       path: '/storage/emulated/0/DCIM/Camera/sample_video.mp4',
       size: 52428800, // 50MB
       mimeType: 'video/mp4',
+      format: VideoFormat.MP4,
       createdAt: new Date('2025-09-17T10:00:00Z'),
-      lastModified: new Date('2025-09-17T10:00:00Z'),
+      modifiedAt: new Date('2025-09-17T10:00:00Z'),
       metadata: {
         duration: 30000, // 30 seconds
         width: 1920,
@@ -63,6 +67,7 @@ describe('VideoProcessorService Contract', () => {
         frameRate: 30.0,
         bitrate: 8000000, // 8 Mbps
         codec: 'h264',
+        codecName: 'H.264',
         audioCodec: 'aac',
         audioBitrate: 128000,
         audioSampleRate: 44100,
@@ -73,19 +78,11 @@ describe('VideoProcessorService Contract', () => {
     // Mock conversion request
     mockConversionRequest = {
       id: 'test-request-001',
-      videoFile: mockVideoFile,
+      inputFile: mockVideoFile,
       outputFormat: OutputFormat.MP4,
-      quality: VideoQuality.HD,
+      targetQuality: VideoQuality.HD,
       outputPath: '/storage/emulated/0/VideoConverter/output.mp4',
-      priority: 'normal',
       createdAt: new Date(),
-      customSettings: {
-        videoBitrate: 2000000, // 2 Mbps
-        audioBitrate: 128000,
-        frameRate: 30,
-        enableHardwareAcceleration: true,
-        preset: 'medium',
-      },
     };
 
     // Create mock implementation

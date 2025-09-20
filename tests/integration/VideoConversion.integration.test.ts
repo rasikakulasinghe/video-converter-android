@@ -9,7 +9,7 @@ import { useVideoProcessor } from '../../src/hooks/useVideoProcessor';
 import { useFileStore } from '../../src/stores/fileStore';
 import { useConversionStore } from '../../src/stores/conversionStore';
 import { useDeviceStore } from '../../src/stores/deviceStore';
-import { VideoQuality, OutputFormat, ConversionRequest } from '../../src/types/models';
+import { VideoQuality, OutputFormat, ConversionRequest, VideoFormat } from '../../src/types/models';
 
 // Mock data for tests
 const mockVideoFile = {
@@ -18,7 +18,9 @@ const mockVideoFile = {
   path: '/mock/path/test-video.mp4',
   size: 10485760, // 10MB
   mimeType: 'video/mp4',
+  format: VideoFormat.MP4,
   createdAt: new Date(),
+  modifiedAt: new Date(),
   metadata: {
     duration: 30000,
     width: 1920,
@@ -26,6 +28,7 @@ const mockVideoFile = {
     frameRate: 30,
     bitrate: 2000000,
     codec: 'h264',
+    codecName: 'H.264',
     audioCodec: 'aac',
     audioBitrate: 128000,
     audioSampleRate: 44100,
@@ -74,7 +77,7 @@ describe('VideoConversion Integration Tests', () => {
         outputPath: '/mock/output/converted-video.mp4',
         targetQuality: VideoQuality.HD,
         outputFormat: OutputFormat.MP4,
-        priority: 'normal',
+        targetQuality: VideoQuality.HD,
         createdAt: new Date(),
       };
 
@@ -94,8 +97,8 @@ describe('VideoConversion Integration Tests', () => {
       } else {
         // Already completed (due to fast mock)
         expect(conversionState.jobHistory).toHaveLength(1);
-        expect(conversionState.jobHistory[0].id).toBe(jobId);
-        expect(conversionState.jobHistory[0].status).toBe('completed');
+        expect(conversionState.jobHistory[0]!.id).toBe(jobId);
+        expect(conversionState.jobHistory[0]!.status).toBe('completed');
       }
 
       // Step 4: Monitor Progress
@@ -110,7 +113,7 @@ describe('VideoConversion Integration Tests', () => {
       // Step 5: Verify Completion (our mock completes immediately)
       const finalState = useConversionStore.getState();
       expect(finalState.jobHistory).toHaveLength(1);
-      expect(finalState.jobHistory[0].status).toBe('completed');
+      expect(finalState.jobHistory[0]!.status).toBe('completed');
     });
 
     it('should handle conversion errors gracefully', async () => {
@@ -120,7 +123,7 @@ describe('VideoConversion Integration Tests', () => {
         outputPath: '/invalid/path/output.mp4',
         targetQuality: VideoQuality.HD,
         outputFormat: OutputFormat.MP4,
-        priority: 'normal',
+        targetQuality: VideoQuality.HD,
         createdAt: new Date(),
       };
 
@@ -149,7 +152,7 @@ describe('VideoConversion Integration Tests', () => {
         outputPath: '/mock/output/cancelled-video.mp4',
         targetQuality: VideoQuality.HD,
         outputFormat: OutputFormat.MP4,
-        priority: 'normal',
+        targetQuality: VideoQuality.HD,
         createdAt: new Date(),
       };
 
@@ -172,7 +175,7 @@ describe('VideoConversion Integration Tests', () => {
       } else {
         // If already completed, check job history
         expect(conversionState.jobHistory).toHaveLength(1);
-        expect(['completed', 'cancelled']).toContain(conversionState.jobHistory[0].status);
+        expect(['completed', 'cancelled']).toContain(conversionState.jobHistory[0]!.status);
       }
     });
   });
@@ -200,7 +203,7 @@ describe('VideoConversion Integration Tests', () => {
           outputPath: `/mock/output/converted-${file.name}`,
           targetQuality: VideoQuality.HD,
           outputFormat: OutputFormat.MP4,
-          priority: 'normal',
+          targetQuality: VideoQuality.HD,
           createdAt: new Date(),
         };
 
@@ -232,7 +235,7 @@ describe('VideoConversion Integration Tests', () => {
         outputPath: '/mock/output/monitored-video.mp4',
         targetQuality: VideoQuality.HD,
         outputFormat: OutputFormat.MP4,
-        priority: 'normal',
+        targetQuality: VideoQuality.HD,
         createdAt: new Date(),
       };
 

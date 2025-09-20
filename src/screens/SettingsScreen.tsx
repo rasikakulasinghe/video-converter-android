@@ -1,10 +1,11 @@
 import React, { useCallback, useState } from 'react';
-import { ScrollView, View, Alert, Pressable, Switch, StyleSheet } from 'react-native';
+import { ScrollView, View, Alert, Pressable, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NavigationProp } from '@react-navigation/native';
 
 import { Text } from '../components/atoms/Text';
 import { Button } from '../components/atoms/Button';
+import { Switch } from '../components/atoms/Switch';
 
 import type { RootStackParamList } from '../types/navigation';
 import type { ConversionSettings } from '../types/models';

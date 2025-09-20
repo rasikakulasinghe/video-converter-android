@@ -1,4 +1,4 @@
-import { ConversionResult, ConversionStatus, ConversionProgress, ConversionError, ConversionStats } from '../../src/types/models';
+import { ConversionResult, ConversionStatus, ConversionProgress, ConversionError, ErrorSeverity } from '../../src/types/models';
 import { 
   validateConversionResult,
   createProgressUpdate,
@@ -8,7 +8,7 @@ import {
   isConversionFailed,
   getErrorSeverity
 } from '../../src/types/models/ConversionResult';
-import { ConversionRequest, VideoFile, VideoQuality, OutputFormat } from '../../src/types/models';
+import { ConversionRequest, VideoFile, VideoQuality, OutputFormat, VideoFormat } from '../../src/types/models';
 
 describe('ConversionResult Model', () => {
   // Mock data for testing
@@ -18,7 +18,9 @@ describe('ConversionResult Model', () => {
     path: '/storage/emulated/0/DCIM/Camera/sample-video.mp4',
     size: 52428800, // 50MB
     mimeType: 'video/mp4',
+    format: VideoFormat.MP4,
     createdAt: new Date('2025-09-17T10:00:00Z'),
+    modifiedAt: new Date('2025-09-17T10:05:00Z'),
     metadata: {
       duration: 120000, // 2 minutes
       width: 1920,
@@ -26,6 +28,7 @@ describe('ConversionResult Model', () => {
       frameRate: 30,
       bitrate: 5000000,
       codec: 'h264',
+      codecName: 'H.264',
       audioCodec: 'aac',
       audioBitrate: 128000,
       audioSampleRate: 44100,
@@ -61,8 +64,14 @@ describe('ConversionResult Model', () => {
         startTime: new Date('2025-09-17T10:00:00Z'),
         endTime: new Date('2025-09-17T10:02:30Z'),
         outputFile: {
+          id: 'output-video-001',
+          name: 'output.mp4',
           path: '/storage/emulated/0/VideoConverter/output.mp4',
           size: 26214400, // 25MB
+          mimeType: 'video/mp4',
+          format: VideoFormat.MP4,
+          createdAt: new Date('2025-09-17T10:02:30Z'),
+          modifiedAt: new Date('2025-09-17T10:02:30Z'),
           metadata: {
             duration: 120000,
             width: 1280,
@@ -70,6 +79,7 @@ describe('ConversionResult Model', () => {
             frameRate: 30,
             bitrate: 2500000,
             codec: 'h264',
+            codecName: 'H.264',
             audioCodec: 'aac',
             audioBitrate: 128000,
             audioSampleRate: 44100,
@@ -77,8 +87,6 @@ describe('ConversionResult Model', () => {
           },
         },
         stats: {
-          inputSize: 52428800,
-          outputSize: 26214400,
           compressionRatio: 0.5,
           processingDuration: 150000, // 2.5 minutes
           averageSpeed: 0.8, // 0.8x real-time
@@ -115,7 +123,7 @@ describe('ConversionResult Model', () => {
         error: {
           code: 'FFMPEG_ERROR',
           message: 'Failed to encode video: Insufficient memory',
-          severity: 'critical',
+          severity: ErrorSeverity.CRITICAL,
           details: {
             ffmpegExitCode: 1,
             memoryUsage: 2048000000, // 2GB
@@ -174,8 +182,14 @@ describe('ConversionResult Model', () => {
       startTime: new Date('2025-09-17T10:00:00Z'),
       endTime: new Date('2025-09-17T10:02:30Z'),
       outputFile: {
+        id: 'valid-output-001',
+        name: 'output.mp4',
         path: '/storage/emulated/0/VideoConverter/output.mp4',
         size: 26214400,
+        mimeType: 'video/mp4',
+        format: VideoFormat.MP4,
+        createdAt: new Date('2025-09-17T10:02:30Z'),
+        modifiedAt: new Date('2025-09-17T10:02:30Z'),
         metadata: {
           duration: 120000,
           width: 1280,
@@ -183,6 +197,7 @@ describe('ConversionResult Model', () => {
           frameRate: 30,
           bitrate: 2500000,
           codec: 'h264',
+          codecName: 'H.264',
           audioCodec: 'aac',
           audioBitrate: 128000,
           audioSampleRate: 44100,
@@ -255,7 +270,6 @@ describe('ConversionResult Model', () => {
       const incompleteResult = {
         ...validResult,
         status: ConversionStatus.COMPLETED,
-        endTime: undefined,
       };
 
       const result = validateConversionResult(incompleteResult);
@@ -267,7 +281,6 @@ describe('ConversionResult Model', () => {
       const noOutputResult = {
         ...validResult,
         status: ConversionStatus.COMPLETED,
-        outputFile: undefined,
       };
 
       const result = validateConversionResult(noOutputResult);
@@ -279,7 +292,6 @@ describe('ConversionResult Model', () => {
       const noErrorResult = {
         ...validResult,
         status: ConversionStatus.FAILED,
-        error: undefined,
       };
 
       const result = validateConversionResult(noErrorResult);
@@ -525,7 +537,7 @@ describe('ConversionResult Model', () => {
         const error: ConversionError = {
           code,
           message: 'Critical error occurred',
-          severity: 'critical',
+          severity: ErrorSeverity.CRITICAL,
         };
 
         expect(getErrorSeverity(error)).toBe('critical');
@@ -543,7 +555,7 @@ describe('ConversionResult Model', () => {
         const error: ConversionError = {
           code,
           message: 'Warning occurred',
-          severity: 'warning',
+          severity: ErrorSeverity.MEDIUM,
         };
 
         expect(getErrorSeverity(error)).toBe('warning');
@@ -554,7 +566,7 @@ describe('ConversionResult Model', () => {
       const error: ConversionError = {
         code: 'UNKNOWN_ERROR',
         message: 'Unknown error occurred',
-        severity: 'info',
+        severity: ErrorSeverity.LOW,
       };
 
       expect(getErrorSeverity(error)).toBe('info');
@@ -580,8 +592,14 @@ describe('ConversionResult Model', () => {
         startTime: new Date('2025-09-17T10:00:00Z'),
         endTime: new Date('2025-09-17T10:00:05Z'), // 5 seconds processing
         outputFile: {
+          id: 'fast-output-001',
+          name: 'fast-output.mp4',
           path: '/storage/emulated/0/VideoConverter/fast-output.mp4',
           size: 5242880, // 5MB
+          mimeType: 'video/mp4',
+          format: VideoFormat.MP4,
+          createdAt: new Date('2025-09-17T10:00:30Z'),
+          modifiedAt: new Date('2025-09-17T10:00:30Z'),
           metadata: {
             duration: 10000,
             width: 1280,
@@ -589,6 +607,7 @@ describe('ConversionResult Model', () => {
             frameRate: 30,
             bitrate: 1000000,
             codec: 'h264',
+            codecName: 'H.264',
           },
         },
       };
@@ -615,8 +634,14 @@ describe('ConversionResult Model', () => {
         startTime: new Date('2025-09-17T10:00:00Z'),
         endTime: new Date('2025-09-17T10:30:00Z'), // 30 minutes processing
         outputFile: {
+          id: 'slow-output-001',
+          name: 'slow-output.mp4',
           path: '/storage/emulated/0/VideoConverter/slow-output.mp4',
           size: 15728640, // 15MB
+          mimeType: 'video/mp4',
+          format: VideoFormat.MP4,
+          createdAt: new Date('2025-09-17T10:05:00Z'),
+          modifiedAt: new Date('2025-09-17T10:05:00Z'),
           metadata: {
             duration: 120000,
             width: 1280,
@@ -624,6 +649,7 @@ describe('ConversionResult Model', () => {
             frameRate: 30,
             bitrate: 500000,
             codec: 'h264',
+            codecName: 'H.264',
           },
         },
       };

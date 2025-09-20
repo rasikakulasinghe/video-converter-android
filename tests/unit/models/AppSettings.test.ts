@@ -5,7 +5,7 @@
  * Following TDD approach as per constitutional requirements
  */
 
-import { 
+import {
   AppSettings,
   DefaultConversionSettings,
   ThemeSettings,

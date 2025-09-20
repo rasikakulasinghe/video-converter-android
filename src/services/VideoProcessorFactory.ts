@@ -37,7 +37,7 @@ export class VideoProcessorFactory {
       // or a simple file manipulation service
 
       throw new Error(
-        `Video processing is not available on this platform: ${error.message}`
+        `Video processing is not available on this platform: ${(error as Error).message}`
       );
     }
   }
@@ -45,9 +45,9 @@ export class VideoProcessorFactory {
   /**
    * Reset the singleton instance (useful for testing)
    */
-  static reset(): void {
-    if (this.instance && typeof this.instance.destroy === 'function') {
-      this.instance.destroy();
+  static async reset(): Promise<void> {
+    if (this.instance && 'destroy' in this.instance && typeof (this.instance as any).destroy === 'function') {
+      await (this.instance as any).destroy();
     }
     this.instance = null;
   }

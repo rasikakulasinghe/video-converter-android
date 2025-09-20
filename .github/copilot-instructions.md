@@ -1,13 +1,13 @@
 # GitHub Copilot Instructions: Mobile Video Converter Android App
 
 **Project**: Mobile Video Converter Android App  
-**Date**: September 17, 2025  
-**Constitution**: v1.0.0  
-**Last Updated**: Initial Setup
+**Date**: September 20, 2025  
+**Constitution**: v1.1.0  
+**Last Updated**: Project Implementation Phase
 
 ## Project Overview
 
-You are working on a **Mobile Video Converter Android App** - an offline React Native application that converts video files to web-optimized MP4 format using device processing power. The app features touch-optimized Material Design UI, real-time progress tracking, device resource management, and APK distribution capabilities.
+You are working on a **Mobile Video Converter Android App** - an offline Expo React Native application that converts video files to web-optimized MP4 format using Android Media3 processing power. The app features touch-optimized Material Design UI, real-time progress tracking, device resource management, and EAS build distribution capabilities.
 
 ## Constitutional Requirements (NON-NEGOTIABLE)
 
@@ -34,31 +34,48 @@ You are working on a **Mobile Video Converter Android App** - an offline React N
 
 ### Core Technologies
 ```typescript
-// Required packages and versions
-"react-native": "^0.73.0"
-"typescript": "^5.0.0"
-"@ffmpeg-kit/react-native": "^5.1.0"
+// Required packages and versions (Current Implementation)
+"expo": "~52.0.47"
+"react-native": "0.76.9"
+"typescript": "~5.9.2"
 "react-native-fs": "^2.20.0"
 "zustand": "^4.4.0"
 "nativewind": "^2.0.11"
-"react-navigation": "^6.0.0"
-"react-native-device-info": "^10.0.0"
+"@react-navigation/native": "^7.1.17"
+"@react-navigation/native-stack": "^7.2.0"
+"react-native-device-info": "^14.1.1"
+"expo-av": "~15.0.2"
+"expo-file-system": "~18.0.12"
+"expo-document-picker": "~13.0.3"
+"@react-native-async-storage/async-storage": "1.23.1"
 ```
 
 ### Architecture Pattern
 ```
 src/
 ├── components/
-│   ├── atoms/           # Buttons, Icons, Text
-│   ├── molecules/       # Forms, Cards, Progress
-│   ├── organisms/       # Complex UI sections
-│   └── templates/       # Screen layouts
-├── screens/             # Main, Settings, Results
-├── services/            # Video, File, Device, Settings
-├── hooks/               # Custom React hooks
-├── stores/              # Zustand state stores
+│   ├── atoms/           # Button, Icon, Input, ProgressBar, Text
+│   ├── molecules/       # ActionSheet, ConversionForm, FileCard, ProgressCard
+│   ├── organisms/       # Complex UI sections (TBD)
+│   └── templates/       # Screen layouts (TBD)
+├── screens/             # MainScreen, ResultsScreen, SettingsScreen
+├── services/            # VideoProcessor, FileManager, Device, Settings
+│   └── implementations/ # Service implementations
+├── hooks/               # useFileManager, useVideoProcessor
+├── stores/              # conversionStore, deviceStore, fileStore, settingsStore
 ├── types/               # TypeScript definitions
-└── utils/               # Helper functions
+│   └── models/          # Data models and interfaces
+├── utils/               # Helper functions (cn.ts)
+└── navigation/          # Navigation configuration
+
+tests/
+├── contract/            # Service contract tests
+├── integration/         # End-to-end scenario tests
+├── performance/         # Performance benchmarks
+├── unit/                # Unit tests
+├── models/              # Model validation tests
+├── services/            # Service-specific tests
+└── mocks/               # Test mocks and fixtures
 ```
 
 ## Code Style Guidelines
@@ -224,9 +241,10 @@ describe('ConvertButton', () => {
 ### Service Tests
 ```typescript
 // Mock external dependencies
-jest.mock('@ffmpeg-kit/react-native', () => ({
-  FFmpegKit: {
-    execute: jest.fn(),
+jest.mock('../services/implementations/Media3VideoProcessor', () => ({
+  Media3VideoProcessor: {
+    convertVideo: jest.fn(),
+    analyzeVideo: jest.fn(),
   },
 }));
 
@@ -240,26 +258,34 @@ describe('VideoProcessorService', () => {
 
 ## Video Processing Guidelines
 
-### FFmpeg Integration
+### Media3 Integration
 ```typescript
-// Always use FFmpeg Kit React Native patterns
-import { FFmpegKit, ReturnCode } from 'ffmpeg-kit-react-native';
+// Always use Android Media3 patterns
+import { VideoProcessorService, ConversionRequest, ConversionResult } from '../services/VideoProcessorService';
 
-const convertVideo = async (input: string, output: string) => {
-  const command = `-i ${input} -c:v libx264 -c:a aac ${output}`;
+const convertVideo = async (request: ConversionRequest): Promise<ConversionResult> => {
+  const processor = VideoProcessorFactory.create();
   
-  const session = await FFmpegKit.executeAsync(
-    command,
-    (session) => {
-      // Completion callback
-    },
-    (log) => {
-      // Progress callback
-    },
-    (statistics) => {
-      // Statistics callback for progress
-    }
-  );
+  // Create conversion session
+  const session = await processor.createConversionSession(request);
+  
+  // Start conversion with progress monitoring
+  return new Promise((resolve, reject) => {
+    session.onProgress((progress) => {
+      // Update UI with conversion progress
+      updateProgress(progress);
+    });
+    
+    session.onComplete((result) => {
+      resolve(result);
+    });
+    
+    session.onError((error) => {
+      reject(error);
+    });
+    
+    session.start();
+  });
 };
 ```
 
@@ -279,6 +305,62 @@ const useDeviceMonitor = () => {
     
     return () => clearInterval(interval);
   }, []);
+};
+```
+
+## Expo Specific Patterns
+
+### EAS Build Configuration
+```typescript
+// Build commands for different environments
+"scripts": {
+  "build:android": "eas build --platform android",
+  "build:android:preview": "eas build --platform android --profile preview",
+  "build:android:development": "eas build --platform android --profile development"
+}
+
+// EAS.json profiles configured for:
+// - development: APK builds for testing
+// - preview: Internal distribution APKs
+// - production: AAB bundles for Play Store
+```
+
+### Expo File System
+```typescript
+// Use Expo File System for file operations
+import * as FileSystem from 'expo-file-system';
+
+const saveConvertedVideo = async (tempUri: string, filename: string) => {
+  const destUri = `${FileSystem.documentDirectory}converted/${filename}`;
+  await FileSystem.makeDirectoryAsync(
+    `${FileSystem.documentDirectory}converted/`,
+    { intermediates: true }
+  );
+  await FileSystem.moveAsync({ from: tempUri, to: destUri });
+  return destUri;
+};
+```
+
+### Expo Document Picker
+```typescript
+// File selection with proper type filtering
+import * as DocumentPicker from 'expo-document-picker';
+
+const selectVideoFile = async (): Promise<VideoFile | null> => {
+  const result = await DocumentPicker.getDocumentAsync({
+    type: ['video/*'],
+    copyToCacheDirectory: true,
+  });
+  
+  if (!result.canceled && result.assets[0]) {
+    return {
+      uri: result.assets[0].uri,
+      name: result.assets[0].name,
+      size: result.assets[0].size,
+      mimeType: result.assets[0].mimeType,
+    };
+  }
+  return null;
 };
 ```
 
@@ -323,16 +405,20 @@ const requestStoragePermission = async () => {
 ## Recent Changes
 
 ### Latest Updates
-1. **Project Setup**: Initial React Native 0.73 project configuration
+1. **Project Setup**: Expo React Native 0.76.9 with EAS build configuration
 2. **Constitutional Requirements**: Established component-driven development standards
-3. **Technical Stack**: Selected FFmpeg Kit, Zustand, NativeWind architecture
-4. **Design System**: Defined Material Design color palette and spacing
+3. **Technical Stack**: Selected Media3, Zustand, NativeWind architecture
+4. **Component Library**: Implemented atomic design components (atoms/molecules)
+5. **Service Architecture**: Video processing, file management, and device monitoring services
+6. **State Management**: Zustand stores for conversion, device, file, and settings
+7. **Testing Infrastructure**: Comprehensive test structure with contract, integration, unit tests
+8. **TypeScript Definitions**: Complete type system with models and service interfaces
 
 ### Upcoming Work
-1. **Phase 1**: Atomic component library implementation
-2. **Phase 2**: Video processing service development
-3. **Phase 3**: Device resource monitoring integration
-4. **Phase 4**: APK build and distribution setup
+1. **Phase 1**: Complete organism and template components ✅ Partially Done
+2. **Phase 2**: Video processing Media3 native implementation
+3. **Phase 3**: UI integration with conversion workflow
+4. **Phase 4**: EAS build optimization and APK distribution
 
 ## Important Reminders
 

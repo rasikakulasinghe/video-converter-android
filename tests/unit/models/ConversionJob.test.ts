@@ -121,7 +121,8 @@ describe('ConversionJob Model', () => {
           height: 1080,
           frameRate: 30,
           bitrate: 5000000,
-          codecName: 'h264'
+          codec: 'h264',
+          codecName: 'H.264'
         },
         createdAt: new Date(),
         modifiedAt: new Date()
@@ -229,7 +230,8 @@ describe('ConversionJob Model', () => {
             height: 1080,
             frameRate: 30,
             bitrate: 2000000,
-            codecName: 'h264'
+            codec: 'h264',
+            codecName: 'H.264'
           },
           createdAt: new Date(),
           modifiedAt: new Date()
