@@ -20,7 +20,7 @@ describe('VideoFile Model', () => {
           frameRate: 30,
           bitrate: 5000000, // 5 Mbps
           codec: 'h264',
-          codecName: 'H.264',
+        codecName: 'h264',
           audioCodec: 'aac',
           audioBitrate: 128000,
           audioSampleRate: 44100,
@@ -60,7 +60,7 @@ describe('VideoFile Model', () => {
           frameRate: 30,
           bitrate: 2000000,
           codec: 'h264',
-          codecName: 'H.264',
+        codecName: 'h264',
         },
       };
 
@@ -78,7 +78,9 @@ describe('VideoFile Model', () => {
       path: '/storage/emulated/0/DCIM/valid-video.mp4',
       size: 10485760, // 10MB
       mimeType: 'video/mp4',
+      format: VideoFormat.MP4,
       createdAt: new Date(),
+      modifiedAt: new Date(),
       metadata: {
         duration: 60000,
         width: 1920,
@@ -86,6 +88,7 @@ describe('VideoFile Model', () => {
         frameRate: 30,
         bitrate: 3000000,
         codec: 'h264',
+        codecName: 'h264',
       },
     };
 
@@ -234,6 +237,7 @@ describe('VideoFile Model', () => {
         frameRate: 30,
         bitrate: 20000000,
         codec: 'h264',
+        codecName: 'h264',
       };
 
       expect(getVideoQuality(video4K)).toBe(VideoQuality.UHD_4K);
@@ -247,6 +251,7 @@ describe('VideoFile Model', () => {
         frameRate: 30,
         bitrate: 5000000,
         codec: 'h264',
+        codecName: 'h264',
       };
 
       expect(getVideoQuality(video1080p)).toBe(VideoQuality.FULL_HD);
@@ -260,6 +265,7 @@ describe('VideoFile Model', () => {
         frameRate: 30,
         bitrate: 2500000,
         codec: 'h264',
+        codecName: 'h264',
       };
 
       expect(getVideoQuality(video720p)).toBe(VideoQuality.HD);
@@ -273,6 +279,7 @@ describe('VideoFile Model', () => {
         frameRate: 30,
         bitrate: 1000000,
         codec: 'h264',
+        codecName: 'h264',
       };
 
       expect(getVideoQuality(video480p)).toBe(VideoQuality.SD);
@@ -286,6 +293,7 @@ describe('VideoFile Model', () => {
         frameRate: 30,
         bitrate: 500000,
         codec: 'h264',
+        codecName: 'h264',
       };
 
       expect(getVideoQuality(video360p)).toBe(VideoQuality.LOW);
@@ -299,6 +307,7 @@ describe('VideoFile Model', () => {
         frameRate: 30,
         bitrate: 3000000,
         codec: 'h264',
+        codecName: 'h264',
       };
 
       // Should classify based on closest standard resolution
@@ -313,6 +322,7 @@ describe('VideoFile Model', () => {
         frameRate: 30,
         bitrate: 5000000,
         codec: 'h264',
+        codecName: 'h264',
       };
 
       expect(getVideoQuality(videoPortrait)).toBe(VideoQuality.FULL_HD);
@@ -375,7 +385,7 @@ describe('VideoFile Model', () => {
           frameRate: 15,
           bitrate: 8000, // Very low bitrate
           codec: 'h264',
-          codecName: 'H.264',
+        codecName: 'h264',
         },
       };
 
@@ -400,7 +410,7 @@ describe('VideoFile Model', () => {
           frameRate: 60,
           bitrate: 100000000, // High bitrate
           codec: 'h264',
-          codecName: 'H.264',
+          codecName: 'h264',
         },
       };
 
@@ -415,7 +425,9 @@ describe('VideoFile Model', () => {
         path: '/path/to/future.mp4',
         size: 1048576,
         mimeType: 'video/mp4',
+        format: VideoFormat.MP4,
         createdAt: new Date('2026-01-01T00:00:00Z'), // Future date
+        modifiedAt: new Date('2026-01-01T00:00:00Z'),
         metadata: {
           duration: 30000,
           width: 1280,
@@ -423,7 +435,7 @@ describe('VideoFile Model', () => {
           frameRate: 30,
           bitrate: 2000000,
           codec: 'h264',
-          codecName: 'H.264',
+          codecName: 'h264',
         },
       };
 

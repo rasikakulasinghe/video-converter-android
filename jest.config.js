@@ -56,7 +56,7 @@ module.exports = {
     '^@stores/(.*)$': '<rootDir>/src/stores/$1',
     '^@utils/(.*)$': '<rootDir>/src/utils/$1',
     // Mock React Native components and dependencies for testing
-    '^react-native$': '<rootDir>/tests/mocks/react-native.ts',
+    // NOTE: react-native is mocked in tests/setup.ts instead
     '^react-native-fs$': '<rootDir>/tests/mocks/react-native-fs.ts',
     // Mock problematic expo-modules-core entirely
     '^expo-modules-core': '<rootDir>/tests/mocks/expo-modules-core.ts',

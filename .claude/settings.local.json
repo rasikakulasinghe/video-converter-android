@@ -18,7 +18,9 @@
       "Bash(npm run android:*)",
       "Bash(./gradlew:*)",
       "Bash(rg:*)",
-      "Bash(node -e \"\nconst module = require(''./src/screens/SettingsScreen.tsx'');\nconsole.log(''Import test completed'');\n\")"
+      "Bash(node -e \"\nconst module = require(''./src/screens/SettingsScreen.tsx'');\nconsole.log(''Import test completed'');\n\")",
+      "Bash(npm test:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

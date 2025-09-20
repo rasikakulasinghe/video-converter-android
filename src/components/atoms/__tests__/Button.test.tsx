@@ -23,65 +23,73 @@ jest.mock('react-native', () => ({
 
 describe('Button Component', () => {
   it('should render with default props', () => {
-    const button = React.createElement(Button, {}, 'Test Button');
+    const button = React.createElement(Button, { children: 'Test Button' });
     expect(button).toBeDefined();
     expect(button.props.children).toBe('Test Button');
   });
 
   it('should accept variant prop', () => {
     const button = React.createElement(Button, {
+      children: 'Secondary Button',
       variant: 'secondary'
-    }, 'Secondary Button');
+    });
     expect(button.props.variant).toBe('secondary');
   });
 
   it('should accept size prop', () => {
     const button = React.createElement(Button, {
+      children: 'Large Button',
       size: 'lg'
-    }, 'Large Button');
+    });
     expect(button.props.size).toBe('lg');
   });
 
   it('should accept disabled prop', () => {
     const button = React.createElement(Button, {
+      children: 'Disabled Button',
       disabled: true
-    }, 'Disabled Button');
+    });
     expect(button.props.disabled).toBe(true);
   });
 
   it('should accept loading prop', () => {
     const button = React.createElement(Button, {
+      children: 'Loading Button',
       loading: true
-    }, 'Loading Button');
+    });
     expect(button.props.loading).toBe(true);
   });
 
   it('should accept fullWidth prop', () => {
     const button = React.createElement(Button, {
+      children: 'Full Width Button',
       fullWidth: true
-    }, 'Full Width Button');
+    });
     expect(button.props.fullWidth).toBe(true);
   });
 
   it('should accept onPress handler', () => {
     const handlePress = jest.fn();
     const button = React.createElement(Button, {
+      children: 'Clickable Button',
       onPress: handlePress
-    }, 'Clickable Button');
+    });
     expect(button.props.onPress).toBe(handlePress);
   });
 
   it('should accept testID prop', () => {
     const button = React.createElement(Button, {
+      children: 'Test Button',
       testID: 'custom-test-id'
-    }, 'Test Button');
+    });
     expect(button.props.testID).toBe('custom-test-id');
   });
 
   it('should accept accessibilityLabel prop', () => {
     const button = React.createElement(Button, {
+      children: 'Button',
       accessibilityLabel: 'Custom accessibility label'
-    }, 'Button');
+    });
     expect(button.props.accessibilityLabel).toBe('Custom accessibility label');
   });
 
@@ -90,9 +98,10 @@ describe('Button Component', () => {
     const RightIcon = React.createElement('span', {}, '→');
     
     const button = React.createElement(Button, {
+      children: 'Button with Icons',
       leftIcon: LeftIcon,
       rightIcon: RightIcon
-    }, 'Button with Icons');
+    });
     
     expect(button.props.leftIcon).toBe(LeftIcon);
     expect(button.props.rightIcon).toBe(RightIcon);
@@ -100,29 +109,29 @@ describe('Button Component', () => {
 
   describe('Default values', () => {
     it('should use default variant when not specified', () => {
-      const button = React.createElement(Button, {}, 'Default Button');
+      const button = React.createElement(Button, { children: 'Default Button' });
       // Default variant should be 'primary' based on component definition
       expect(button.type).toBe(Button);
     });
 
     it('should use default size when not specified', () => {
-      const button = React.createElement(Button, {}, 'Default Button');
+      const button = React.createElement(Button, { children: 'Default Button' });
       // Default size should be 'md' based on component definition
       expect(button.type).toBe(Button);
     });
 
     it('should not be disabled by default', () => {
-      const button = React.createElement(Button, {}, 'Default Button');
+      const button = React.createElement(Button, { children: 'Default Button' });
       expect(button.props.disabled).toBeUndefined();
     });
 
     it('should not be loading by default', () => {
-      const button = React.createElement(Button, {}, 'Default Button');
+      const button = React.createElement(Button, { children: 'Default Button' });
       expect(button.props.loading).toBeUndefined();
     });
 
     it('should not be full width by default', () => {
-      const button = React.createElement(Button, {}, 'Default Button');
+      const button = React.createElement(Button, { children: 'Default Button' });
       expect(button.props.fullWidth).toBeUndefined();
     });
   });
@@ -133,8 +142,9 @@ describe('Button Component', () => {
     variants.forEach(variant => {
       it(`should accept ${variant} variant`, () => {
         const button = React.createElement(Button, {
+          children: `${variant} Button`,
           variant
-        }, `${variant} Button`);
+        });
         expect(button.props.variant).toBe(variant);
       });
     });
@@ -146,8 +156,9 @@ describe('Button Component', () => {
     sizes.forEach(size => {
       it(`should accept ${size} size`, () => {
         const button = React.createElement(Button, {
+          children: `${size} Button`,
           size
-        }, `${size} Button`);
+        });
         expect(button.props.size).toBe(size);
       });
     });

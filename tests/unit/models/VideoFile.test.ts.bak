@@ -142,7 +142,6 @@ describe('VideoFile Model', () => {
           height: 1080,
           frameRate: 30,
           bitrate: 1000000,
-          codec: 'h264',
           codecName: 'h264'
         };
       }).toBeDefined();
@@ -156,7 +155,6 @@ describe('VideoFile Model', () => {
           height: 1080,
           frameRate: 30,
           bitrate: 1000000,
-          codec: 'h264',
           codecName: 'h264'
         };
       }).toBeDefined();
@@ -171,7 +169,6 @@ describe('VideoFile Model', () => {
         height: 1080,
         frameRate: 30,
         bitrate: 1000000,
-        codec: 'h264',
         codecName: 'h264'
       };
 
@@ -197,7 +194,6 @@ describe('VideoFile Model', () => {
           height: 480,
           frameRate: 30,
           bitrate: 1000000,
-          codec: 'h264',
           codecName: 'h264'
         },
         createdAt: new Date(),
@@ -218,7 +214,6 @@ describe('VideoFile Model', () => {
         height: 1080,
         frameRate: 30,
         bitrate: 1000000,
-        codec: 'h264',
         codecName: 'h264'
       };
 
@@ -250,7 +245,6 @@ describe('VideoFile Model', () => {
             height: 1080,
             frameRate: 30,
             bitrate: 2000000,
-            codec: 'h264',
             codecName: 'h264'
           }
         };

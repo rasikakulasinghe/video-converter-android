@@ -124,11 +124,7 @@ describe('ConversionResult Model', () => {
           code: 'FFMPEG_ERROR',
           message: 'Failed to encode video: Insufficient memory',
           severity: ErrorSeverity.CRITICAL,
-          details: {
-            ffmpegExitCode: 1,
-            memoryUsage: 2048000000, // 2GB
-            availableMemory: 1024000000, // 1GB
-          },
+          timestamp: new Date(),
         },
       };
 
@@ -538,6 +534,7 @@ describe('ConversionResult Model', () => {
           code,
           message: 'Critical error occurred',
           severity: ErrorSeverity.CRITICAL,
+          timestamp: new Date(),
         };
 
         expect(getErrorSeverity(error)).toBe('critical');
@@ -556,6 +553,7 @@ describe('ConversionResult Model', () => {
           code,
           message: 'Warning occurred',
           severity: ErrorSeverity.MEDIUM,
+          timestamp: new Date(),
         };
 
         expect(getErrorSeverity(error)).toBe('warning');
@@ -567,6 +565,7 @@ describe('ConversionResult Model', () => {
         code: 'UNKNOWN_ERROR',
         message: 'Unknown error occurred',
         severity: ErrorSeverity.LOW,
+        timestamp: new Date(),
       };
 
       expect(getErrorSeverity(error)).toBe('info');

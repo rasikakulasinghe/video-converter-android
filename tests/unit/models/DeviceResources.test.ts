@@ -19,7 +19,7 @@ import {
   NetworkType,
   ThermalLevel,
   BatteryState
-} from '@types/models/DeviceResources';
+} from '../../../src/types/models/DeviceResources';
 
 describe('DeviceResources Model', () => {
   describe('DeviceType Enum', () => {

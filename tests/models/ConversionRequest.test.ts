@@ -56,7 +56,6 @@ describe('ConversionRequest Model', () => {
           },
         },
         createdAt: new Date(),
-        targetQuality: VideoQuality.HD,
       };
 
       expect(mockRequest).toHaveProperty('id');

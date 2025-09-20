@@ -221,8 +221,8 @@ describe('ActionSheet', () => {
       };
 
       // Type check - single action should work
-      expect(props.sections[0].actions).toHaveLength(1);
-      expect(props.sections[0].actions[0]).toEqual(action);
+      expect(props.sections[0]?.actions!!).toHaveLength(1);
+      expect(props.sections[0]?.actions!![0]).toEqual(action);
     });
 
     it('should handle multiple actions in section', () => {
@@ -244,8 +244,8 @@ describe('ActionSheet', () => {
       };
 
       // Type check - multiple actions should work
-      expect(props.sections[0].actions).toHaveLength(3);
-      expect(props.sections[0].actions).toEqual(actions);
+      expect(props.sections[0]?.actions!).toHaveLength(3);
+      expect(props.sections[0]?.actions!).toEqual(actions);
     });
 
     it('should handle multiple sections', () => {
@@ -273,8 +273,8 @@ describe('ActionSheet', () => {
 
       // Type check - multiple sections should work
       expect(props.sections).toHaveLength(2);
-      expect(props.sections[0].actions).toHaveLength(2);
-      expect(props.sections[1].actions).toHaveLength(1);
+      expect(props.sections[0]?.actions!).toHaveLength(2);
+      expect(props.sections[1]?.actions!).toHaveLength(1);
     });
 
     it('should handle destructive actions', () => {
@@ -292,7 +292,7 @@ describe('ActionSheet', () => {
 
       // Type check - destructive actions should work
       expect(destructiveAction.destructive).toBe(true);
-      expect(section.actions[0].destructive).toBe(true);
+      expect(section.actions?.[0]?.destructive).toBe(true);
     });
 
     it('should handle disabled actions', () => {
@@ -309,7 +309,7 @@ describe('ActionSheet', () => {
 
       // Type check - disabled actions should work
       expect(disabledAction.disabled).toBe(true);
-      expect(section.actions[0].disabled).toBe(true);
+      expect(section.actions?.[0]?.disabled).toBe(true);
     });
 
     it('should handle actions with icons', () => {
@@ -324,9 +324,9 @@ describe('ActionSheet', () => {
       };
 
       // Type check - icons should work
-      expect(section.actions[0].icon).toBe('play');
-      expect(section.actions[1].icon).toBe('stop');
-      expect(section.actions[2].icon).toBe('settings');
+      expect(section.actions?.[0]?.icon).toBe('play');
+      expect(section.actions?.[1]?.icon).toBe('stop');
+      expect(section.actions?.[2]?.icon).toBe('settings');
     });
   });
 
@@ -464,8 +464,8 @@ describe('ActionSheet', () => {
       };
 
       // Type check - empty actions should work
-      expect(props.sections[0].actions).toEqual([]);
-      expect(props.sections[0].actions).toHaveLength(0);
+      expect(props.sections[0]?.actions!).toEqual([]);
+      expect(props.sections[0]?.actions!).toHaveLength(0);
     });
 
     it('should handle minimal configuration', () => {

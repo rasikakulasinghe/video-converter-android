@@ -77,7 +77,6 @@ describe('VideoConversion Integration Tests', () => {
         outputPath: '/mock/output/converted-video.mp4',
         targetQuality: VideoQuality.HD,
         outputFormat: OutputFormat.MP4,
-        targetQuality: VideoQuality.HD,
         createdAt: new Date(),
       };
 
@@ -123,7 +122,6 @@ describe('VideoConversion Integration Tests', () => {
         outputPath: '/invalid/path/output.mp4',
         targetQuality: VideoQuality.HD,
         outputFormat: OutputFormat.MP4,
-        targetQuality: VideoQuality.HD,
         createdAt: new Date(),
       };
 
@@ -152,7 +150,6 @@ describe('VideoConversion Integration Tests', () => {
         outputPath: '/mock/output/cancelled-video.mp4',
         targetQuality: VideoQuality.HD,
         outputFormat: OutputFormat.MP4,
-        targetQuality: VideoQuality.HD,
         createdAt: new Date(),
       };
 
@@ -203,7 +200,6 @@ describe('VideoConversion Integration Tests', () => {
           outputPath: `/mock/output/converted-${file.name}`,
           targetQuality: VideoQuality.HD,
           outputFormat: OutputFormat.MP4,
-          targetQuality: VideoQuality.HD,
           createdAt: new Date(),
         };
 
@@ -235,7 +231,6 @@ describe('VideoConversion Integration Tests', () => {
         outputPath: '/mock/output/monitored-video.mp4',
         targetQuality: VideoQuality.HD,
         outputFormat: OutputFormat.MP4,
-        targetQuality: VideoQuality.HD,
         createdAt: new Date(),
       };
 

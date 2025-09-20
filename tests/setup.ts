@@ -5,8 +5,72 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-// Mock React Native using external mock
-jest.mock('react-native');
+// Mock React Native using external mock with explicit implementation
+jest.mock('react-native', () => {
+  const React = require('react');
+
+  const createMockComponent = (type: string) => {
+    const component = (props: any) => {
+      const { children, testID, style, onPress, ...restProps } = props;
+
+      let finalProps: any = {
+        'data-testid': testID,
+        ...restProps
+      };
+
+      // Handle style as function (React Native pattern for pressed state)
+      if (typeof style === 'function') {
+        finalProps.style = style({ pressed: false });
+      } else {
+        finalProps.style = style;
+      }
+
+      // Handle onPress for buttons
+      if (onPress) {
+        finalProps.onClick = onPress;
+      }
+
+      return React.createElement(type, finalProps, children);
+    };
+
+    // Set displayName for debugging
+    component.displayName = `Mock${type.charAt(0).toUpperCase() + type.slice(1)}`;
+
+    return component;
+  };
+
+  return {
+    Pressable: createMockComponent('button'),
+    Text: createMockComponent('span'),
+    View: createMockComponent('div'),
+    ScrollView: createMockComponent('div'),
+    ActivityIndicator: (props: any) => {
+      const { testID, ...restProps } = props;
+      return React.createElement('div', {
+        'data-testid': testID,
+        ...restProps
+      }, 'Loading...');
+    },
+    Alert: {
+      alert: jest.fn((title: string, message?: string, buttons?: any[]) => {
+        console.log(`Alert: ${title}${message ? ` - ${message}` : ''}`);
+      }),
+    },
+    Platform: {
+      OS: 'android' as const,
+      Version: 30,
+      select: jest.fn((spec: any) => spec.android || spec.default),
+      isTV: false,
+      isTesting: true,
+    },
+    StyleSheet: {
+      create: jest.fn((styles) => styles),
+      flatten: jest.fn((style) => style),
+      compose: jest.fn((style1, style2) => [style1, style2]),
+      hairlineWidth: 1,
+    },
+  };
+});
 
 // Mock React Native FS - Inline to avoid circular dependency
 jest.mock('react-native-fs', () => ({
