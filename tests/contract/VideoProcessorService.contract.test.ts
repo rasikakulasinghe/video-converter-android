@@ -18,18 +18,97 @@ import { Media3VideoProcessor } from '../../src/services/implementations/Media3V
 import type { ConversionRequest } from '../../src/types/models';
 import { VideoQuality, OutputFormat, VideoFormat } from '../../src/types/models';
 
+// Create a mock state manager for tracking session states
+const mockSessionStates = new Map<string, string>();
+
 // Mock React Native modules for Media3
 jest.mock('react-native', () => ({
   Platform: { OS: 'android' },
   NativeModules: {
     Media3VideoProcessor: {
-      convertVideo: jest.fn(),
-      analyzeVideo: jest.fn(),
-      cancelConversion: jest.fn(),
-      getCapabilities: jest.fn(),
-      EVENT_CONVERSION_PROGRESS: 'conversionProgress',
-      EVENT_CONVERSION_COMPLETE: 'conversionComplete',
-      EVENT_CONVERSION_ERROR: 'conversionError'
+      // Mock constants
+      EVENT_CONVERSION_PROGRESS: 'Media3VideoProcessor_Progress',
+      EVENT_CONVERSION_COMPLETE: 'Media3VideoProcessor_Complete',
+      EVENT_CONVERSION_ERROR: 'Media3VideoProcessor_Error',
+
+      // Mock methods
+      convertVideo: jest.fn((sessionId: string, config: any) => Promise.resolve('conversion-started')),
+
+      getCapabilities: jest.fn(() => Promise.resolve({
+        supportedInputFormats: ['mp4', 'mov', 'avi'],
+        supportedOutputFormats: ['mp4', 'webm'],
+        supportedQualities: ['720p', '1080p', '4K'],
+        supportsHardwareAcceleration: true,
+        supportsHDR: false,
+        maxConcurrentSessions: 2,
+      })),
+
+      analyzeVideo: jest.fn((filePath: string) => Promise.resolve({
+        isValid: true,
+        metadata: {
+          duration: 120000,
+          width: 1920,
+          height: 1080,
+          frameRate: 30,
+          bitrate: 5000000,
+          codec: 'h264',
+          audioBitrate: 128000,
+          audioSampleRate: 44100,
+          audioChannels: 2,
+        },
+        supportedFormats: ['MP4', 'WEBM'],
+        recommendedQuality: 'HD',
+        estimatedProcessingTime: 60000,
+      })),
+
+      getDeviceCapabilities: jest.fn(() => Promise.resolve({
+        supportsHardwareAcceleration: true,
+        maxResolution: { width: 1920, height: 1080 },
+        supportedCodecs: ['h264', 'h265'],
+        maxConcurrentSessions: 2,
+      })),
+
+      createSession: jest.fn((sessionId: string) => {
+        mockSessionStates.set(sessionId, 'CREATED');
+        return Promise.resolve({
+          id: sessionId,
+          state: 'CREATED',
+          createdAt: Date.now(),
+        });
+      }),
+
+      startConversion: jest.fn((sessionId: string, options: any) => {
+        mockSessionStates.set(sessionId, 'PROCESSING');
+        return Promise.resolve();
+      }),
+      pauseConversion: jest.fn((sessionId: string) => {
+        mockSessionStates.set(sessionId, 'PAUSED');
+        return Promise.resolve();
+      }),
+      resumeConversion: jest.fn((sessionId: string) => {
+        mockSessionStates.set(sessionId, 'PROCESSING');
+        return Promise.resolve();
+      }),
+      cancelConversion: jest.fn((sessionId: string) => {
+        mockSessionStates.set(sessionId, 'CANCELLED');
+        return Promise.resolve(true);
+      }),
+
+      getSessionStatus: jest.fn((sessionId: string) => {
+        const state = mockSessionStates.get(sessionId) || 'CREATED';
+        return Promise.resolve({
+          id: sessionId,
+          state: state,
+          progress: state === 'CANCELLED' ? 50 : state === 'COMPLETED' ? 100 : 25,
+        });
+      }),
+
+      validateRequest: jest.fn((request: any) => Promise.resolve({
+        isValid: true,
+        errors: [],
+        warnings: [],
+      })),
+
     }
   },
   NativeEventEmitter: jest.fn().mockImplementation(() => ({

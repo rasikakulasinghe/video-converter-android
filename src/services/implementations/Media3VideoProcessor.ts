@@ -334,7 +334,7 @@ export class Media3VideoProcessor implements VideoProcessorService {
       if (cancelled) {
         session.state = SessionState.CANCELLED;
         session.completedAt = new Date();
-        this.activeSessions.delete(sessionId);
+        // Keep session in map so status can be queried after cancellation
       }
     } catch (error) {
       if (error instanceof ProcessingError) {

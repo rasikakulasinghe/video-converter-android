@@ -25,7 +25,7 @@ import {
   ThumbnailOptions,
   ThumbnailResult,
 } from '../../src/services/FileManagerService';
-import { VideoFile } from '../../src/types/models';
+import { VideoFile, VideoFormat } from '../../src/types/models';
 
 describe('FileManagerService Contract', () => {
   let mockFileManager: FileManagerService;
@@ -39,7 +39,9 @@ describe('FileManagerService Contract', () => {
       path: '/storage/emulated/0/DCIM/Camera/sample_video.mp4',
       size: 52428800, // 50MB
       mimeType: 'video/mp4',
+      format: VideoFormat.MP4,
       createdAt: new Date('2025-09-17T10:00:00Z'),
+      modifiedAt: new Date('2025-09-17T10:05:00Z'),
       metadata: {
         duration: 30000,
         width: 1920,
@@ -47,6 +49,7 @@ describe('FileManagerService Contract', () => {
         frameRate: 30.0,
         bitrate: 8000000,
         codec: 'h264',
+        codecName: 'H.264',
         audioCodec: 'aac',
         audioBitrate: 128000,
         audioSampleRate: 44100,
@@ -165,6 +168,7 @@ describe('FileManagerService Contract', () => {
         name: 'VideoConverter',
         path: '/storage/emulated/0/VideoConverter',
         size: 0,
+        mimeType: 'inode/directory',
         isDirectory: true,
         isFile: false,
         isReadable: true,
@@ -459,6 +463,7 @@ describe('FileManagerService Contract', () => {
         name: 'Camera',
         path: directoryPath,
         size: 0,
+        mimeType: 'inode/directory',
         isDirectory: true,
         isFile: false,
         isReadable: true,
@@ -505,6 +510,7 @@ describe('FileManagerService Contract', () => {
         name: 'EmptyDir',
         path: '/storage/emulated/0/EmptyDir',
         size: 0,
+        mimeType: 'inode/directory',
         isDirectory: true,
         isFile: false,
         isReadable: true,
@@ -671,8 +677,8 @@ describe('FileManagerService Contract', () => {
       const results = await mockFileManager.searchFiles(searchOptions);
       
       expect(results).toHaveLength(1);
-      expect(results[0].file.name).toBe('my_video.mp4');
-      expect(results[0].score).toBe(0.95);
+      expect(results[0]?.file.name).toBe('my_video.mp4');
+      expect(results[0]?.score).toBe(0.95);
     });
 
     it('should return empty results when no files match', async () => {
@@ -781,7 +787,6 @@ describe('FileManagerService Contract', () => {
       const expectedThumbnail: ThumbnailResult = {
         success: false,
         error: 'Unable to decode video frame',
-        thumbnailPath: undefined,
         width: 0,
         height: 0,
         fileSize: 0,
@@ -816,10 +821,10 @@ describe('FileManagerService Contract', () => {
       const results = await mockFileManager.batchMove(operations);
       
       expect(results).toHaveLength(3);
-      expect(results[0].success).toBe(true);
-      expect(results[1].success).toBe(true);
-      expect(results[2].success).toBe(false);
-      expect(results[2].error).toBe('Permission denied');
+      expect(results[0]?.success).toBe(true);
+      expect(results[1]?.success).toBe(true);
+      expect(results[2]?.success).toBe(false);
+      expect(results[2]?.error).toBe('Permission denied');
     });
 
     it('should perform batch delete operations', async () => {

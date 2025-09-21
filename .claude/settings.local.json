@@ -22,7 +22,8 @@
       "Bash(npm test:*)",
       "Bash(node:*)",
       "Bash(rm:*)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(cloc:*)"
     ],
     "deny": [],
     "ask": []

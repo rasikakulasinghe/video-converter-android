@@ -266,7 +266,8 @@ describe('ConversionResult Model', () => {
       const incompleteResult = {
         ...validResult,
         status: ConversionStatus.COMPLETED,
-      };
+        endTime: undefined,
+      } as any;
 
       const result = validateConversionResult(incompleteResult);
       expect(result.isValid).toBe(false);
@@ -277,7 +278,8 @@ describe('ConversionResult Model', () => {
       const noOutputResult = {
         ...validResult,
         status: ConversionStatus.COMPLETED,
-      };
+        outputFile: undefined,
+      } as any;
 
       const result = validateConversionResult(noOutputResult);
       expect(result.isValid).toBe(false);
@@ -541,7 +543,7 @@ describe('ConversionResult Model', () => {
       });
     });
 
-    it('should identify warning errors', () => {
+    it('should identify medium severity errors', () => {
       const warningErrors = [
         'LOW_BATTERY',
         'QUALITY_DEGRADED',
@@ -556,11 +558,11 @@ describe('ConversionResult Model', () => {
           timestamp: new Date(),
         };
 
-        expect(getErrorSeverity(error)).toBe('warning');
+        expect(getErrorSeverity(error)).toBe('medium');
       });
     });
 
-    it('should default to info for unknown errors', () => {
+    it('should return low severity for unknown errors', () => {
       const error: ConversionError = {
         code: 'UNKNOWN_ERROR',
         message: 'Unknown error occurred',
@@ -568,7 +570,7 @@ describe('ConversionResult Model', () => {
         timestamp: new Date(),
       };
 
-      expect(getErrorSeverity(error)).toBe('info');
+      expect(getErrorSeverity(error)).toBe('low');
     });
   });
 

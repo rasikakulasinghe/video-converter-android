@@ -235,6 +235,7 @@ describe('DeviceMonitorService Contract', () => {
         config: {
           interval: 5000,
           enableAlerts: true,
+          features: ['thermal'],
           thresholds: {
             thermal: ThermalState.SERIOUS,
           },
@@ -541,7 +542,7 @@ describe('DeviceMonitorService Contract', () => {
       
       expect(availability.feature).toBe(HardwareFeature.HARDWARE_ENCODER);
       expect(availability.isAvailable).toBe(true);
-      expect(availability.details?.codecs).toContain('h264');
+      expect(availability.details?.['codecs']).toContain('h264');
     });
 
     it('should handle unsupported hardware features', async () => {
@@ -694,7 +695,7 @@ describe('DeviceMonitorService Contract', () => {
       
       expect(result.config.interval).toBe(1000);
       expect(result.config.enableAlerts).toBe(false);
-      expect(result.config.customSettings!.logToFile).toBe(true);
+      expect(result.config.customSettings!['logToFile']).toBe(true);
     });
   });
 

@@ -72,7 +72,8 @@ export type {
   ConversionRequest,
   ConversionValidationResult,
   ConversionQualityPreset,
-  ConversionOptions
+  ConversionOptions,
+  ConversionPriority
 } from './ConversionRequest';
 
 export type {

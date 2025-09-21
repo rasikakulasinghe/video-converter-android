@@ -60,6 +60,8 @@ module.exports = {
     '^react-native-fs$': '<rootDir>/tests/mocks/react-native-fs.ts',
     // Mock problematic expo-modules-core entirely
     '^expo-modules-core': '<rootDir>/tests/mocks/expo-modules-core.ts',
+    // Mock expo-file-system to prevent TypeScript type errors
+    '^expo-file-system$': '<rootDir>/tests/mocks/expo-file-system.ts',
   },
   // Add clearMocks to reset all mocks between tests
   clearMocks: true,

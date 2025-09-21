@@ -56,6 +56,7 @@ describe('ConversionRequest Model', () => {
           },
         },
         createdAt: new Date(),
+        priority: 'normal',
       };
 
       expect(mockRequest).toHaveProperty('id');
@@ -336,9 +337,8 @@ describe('ConversionRequest Model', () => {
       };
 
       const estimatedTime = estimateConversionTime(request);
-      const fullVideoEstimate = estimateConversionTime({
-        ...request,
-      });
+      const { options, ...requestWithoutOptions } = request;
+      const fullVideoEstimate = estimateConversionTime(requestWithoutOptions);
 
       // Trimmed video should take less time
       expect(estimatedTime).toBeLessThan(fullVideoEstimate);

@@ -217,10 +217,10 @@ describe('SettingsService Contract', () => {
 
       const allSettings = await mockSettingsService.getAllSettings();
       
-      expect(allSettings.app).toEqual(mockAppSettings);
-      expect(allSettings.userPreferences).toEqual(mockUserPreferences);
-      expect(allSettings.video).toHaveProperty('defaultCodec');
-      expect(allSettings.audio).toHaveProperty('codec');
+      expect(allSettings['app']).toEqual(mockAppSettings);
+      expect(allSettings['userPreferences']).toEqual(mockUserPreferences);
+      expect(allSettings['video']).toHaveProperty('defaultCodec');
+      expect(allSettings['audio']).toHaveProperty('codec');
     });
 
     it('should handle empty settings gracefully', async () => {
@@ -751,7 +751,7 @@ describe('SettingsService Contract', () => {
       
       expect(result.name).toBe('High Quality Video');
       expect(result.type).toBe(ProfileType.CUSTOM);
-      expect(result.settings.video.quality).toBe(QualityPreset.ULTRA);
+      expect(result.settings['video'].quality).toBe(QualityPreset.ULTRA);
       expect(result.metadata?.tags).toContain('high-quality');
     });
 
@@ -782,8 +782,8 @@ describe('SettingsService Contract', () => {
       const result = await mockSettingsService.setActiveProfile('battery-saver');
       
       expect(result.isActive).toBe(true);
-      expect(result.settings.userPreferences.lowPowerMode).toBe(true);
-      expect(result.settings.userPreferences.keepScreenOn).toBe(false);
+      expect(result.settings['userPreferences'].lowPowerMode).toBe(true);
+      expect(result.settings['userPreferences'].keepScreenOn).toBe(false);
     });
   });
 
@@ -860,11 +860,11 @@ describe('SettingsService Contract', () => {
       (mockSettingsService.migrateSettings as jest.Mock).mockResolvedValue(migratedSettings);
 
       const result = await mockSettingsService.migrateSettings('0.9.0', oldSettings);
-      
-      expect(result.version).toBe('1.0.0');
-      expect(result.userPreferences.defaultQuality).toBe('high');
-      expect(result.userPreferences.preferHardwareEncoding).toBe(true);
-      expect(result.migrationLog).toContain('Migrated quality "good" to "high"');
+
+      expect(result['version']).toBe('1.0.0');
+      expect(result['userPreferences'].defaultQuality).toBe('high');
+      expect(result['userPreferences'].preferHardwareEncoding).toBe(true);
+      expect(result['migrationLog']).toContain('Migrated quality "good" to "high"');
     });
 
     it('should handle settings version compatibility', async () => {

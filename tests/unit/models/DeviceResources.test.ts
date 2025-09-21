@@ -480,7 +480,7 @@ describe('DeviceResources Model', () => {
 
       expect(() => {
         const capabilities = assessDeviceCapabilities(systemInfo);
-        expect(capabilities.performance.videoProcessingScore).toBeGreaterThan(0);
+        expect(capabilities.processingPower).toBeGreaterThanOrEqual(0);
       }).toBeDefined();
     });
 

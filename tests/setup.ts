@@ -69,6 +69,83 @@ jest.mock('react-native', () => {
       compose: jest.fn((style1, style2) => [style1, style2]),
       hairlineWidth: 1,
     },
+    NativeModules: {
+      Media3VideoProcessor: {
+        // Mock constants
+        EVENT_CONVERSION_PROGRESS: 'Media3VideoProcessor_Progress',
+        EVENT_CONVERSION_COMPLETE: 'Media3VideoProcessor_Complete',
+        EVENT_CONVERSION_ERROR: 'Media3VideoProcessor_Error',
+
+        // Mock methods - Match the interface exactly
+        convertVideo: jest.fn((sessionId: string, config: any) => Promise.resolve('conversion-started')),
+
+        analyzeVideo: jest.fn((filePath: string) => Promise.resolve({
+          isValid: true,
+          metadata: {
+            duration: 120000,
+            width: 1920,
+            height: 1080,
+            frameRate: 30,
+            bitrate: 5000000,
+            codec: 'h264',
+            codecName: 'H.264',
+            audioBitrate: 128000,
+            audioSampleRate: 44100,
+            audioChannels: 2,
+          },
+          supportedFormats: ['MP4', 'WEBM'],
+          recommendedQuality: 'HD',
+          estimatedProcessingTime: 60000,
+        })),
+
+        getCapabilities: jest.fn(() => Promise.resolve({
+          supportedInputFormats: ['mp4', 'mov', 'avi'],
+          supportedOutputFormats: ['mp4', 'webm'],
+          supportedQualities: ['720p', '1080p', '4K'],
+          supportsHardwareAcceleration: true,
+          supportsHDR: false,
+          maxConcurrentSessions: 2,
+        })),
+
+        cancelConversion: jest.fn((sessionId: string) => Promise.resolve(true)),
+
+        // Legacy methods for backward compatibility
+        getDeviceCapabilities: jest.fn(() => Promise.resolve({
+          supportsHardwareAcceleration: true,
+          maxResolution: { width: 1920, height: 1080 },
+          supportedCodecs: ['h264', 'h265'],
+          maxConcurrentSessions: 2,
+        })),
+
+        createSession: jest.fn((sessionId: string) => Promise.resolve({
+          id: sessionId,
+          state: 'CREATED',
+          createdAt: Date.now(),
+        })),
+
+        startConversion: jest.fn((sessionId: string, options: any) => Promise.resolve()),
+        pauseConversion: jest.fn((sessionId: string) => Promise.resolve()),
+        resumeConversion: jest.fn((sessionId: string) => Promise.resolve()),
+
+        getSessionStatus: jest.fn((sessionId: string) => Promise.resolve({
+          id: sessionId,
+          state: 'COMPLETED',
+          progress: 100,
+        })),
+
+        validateRequest: jest.fn((request: any) => Promise.resolve({
+          isValid: true,
+          errors: [],
+          warnings: [],
+        })),
+      },
+    },
+    NativeEventEmitter: class MockNativeEventEmitter {
+      addListener = jest.fn();
+      removeAllListeners = jest.fn();
+      removeSubscription = jest.fn();
+      emit = jest.fn();
+    },
   };
 });
 

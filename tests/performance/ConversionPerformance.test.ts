@@ -17,6 +17,7 @@ const mockFFmpegKit = {
   listSessions: jest.fn(() => []),
 };
 
+// Mock ffmpeg module (virtual mock since actual module may not exist)
 jest.mock('ffmpeg-kit-react-native', () => ({
   FFmpegKit: mockFFmpegKit,
   ReturnCode: {
@@ -27,7 +28,7 @@ jest.mock('ffmpeg-kit-react-native', () => ({
     INFO: 'info',
     ERROR: 'error',
   },
-}));
+}), { virtual: true });
 
 // Mock React Native FS
 jest.mock('react-native-fs', () => ({
@@ -58,10 +59,73 @@ import { AndroidDeviceMonitor } from '../../src/services/implementations/Android
 // Import types
 import type { VideoFile, ConversionRequest } from '../../src/types/models';
 import { VideoQuality, OutputFormat, VideoFormat } from '../../src/types/models';
+import type { ProcessingOptions } from '../../src/services/VideoProcessorService';
+import type { DeviceCapabilities } from '../../src/types/models/DeviceCapabilities';
+import { ThermalState } from '../../src/types/models/DeviceCapabilities';
 
 describe.skip('Performance Tests', () => {
   let videoProcessor: Media3VideoProcessor;
   let deviceMonitor: AndroidDeviceMonitor;
+
+  // Helper function to create valid ProcessingOptions
+  const createProcessingOptions = (): ProcessingOptions => {
+    const deviceCapabilities: DeviceCapabilities = {
+      id: 'test-device',
+      deviceModel: 'Test Device',
+      androidVersion: '11',
+      apiLevel: 30,
+      architecture: 'arm64-v8a',
+      lastUpdated: new Date(),
+      battery: {
+        level: 0.8,
+        isCharging: false,
+        health: 'good',
+        temperature: 25,
+        voltage: 3.7,
+        capacity: 4000,
+      },
+      memory: {
+        totalRam: 8 * 1024 * 1024 * 1024, // 8GB
+        availableRam: 4 * 1024 * 1024 * 1024, // 4GB
+        usedRam: 4 * 1024 * 1024 * 1024, // 4GB
+        totalStorage: 128 * 1024 * 1024 * 1024, // 128GB
+        availableStorage: 64 * 1024 * 1024 * 1024, // 64GB
+        usedStorage: 64 * 1024 * 1024 * 1024, // 64GB
+        isLowMemory: false,
+      },
+      thermal: {
+        state: ThermalState.NORMAL,
+        temperature: 35,
+        throttleLevel: 0,
+        maxSafeTemperature: 45,
+      },
+      processor: {
+        cores: 8,
+        maxFrequency: 2400,
+        currentFrequency: 1800,
+        usage: 50,
+        architecture: 'arm64-v8a',
+      },
+      performance: {
+        benchmark: 85000,
+        videoProcessingScore: 85,
+        thermalEfficiency: 90,
+        batteryEfficiency: 85,
+      },
+    };
+
+    return {
+      deviceCapabilities,
+      maxConcurrentSessions: 2,
+      enableHardwareAcceleration: true,
+      useGpuAcceleration: false,
+      qualityPreference: 'balanced',
+      powerSavingMode: false,
+      thermalMonitoring: true,
+      progressUpdateInterval: 1000,
+      tempDirectory: '/tmp',
+    };
+  };
 
   // Test data - Different video sizes for performance testing
   const testVideos: Record<string, VideoFile> = {
@@ -157,7 +221,7 @@ describe.skip('Performance Tests', () => {
         .mockResolvedValueOnce(initialMemory + 104857600); // +100MB during processing
 
       const session = await videoProcessor.createSession(conversionRequest);
-      await videoProcessor.startConversion(session.sessionId, {});
+      await videoProcessor.startConversion(session.id, createProcessingOptions());
       // Mock conversion result for test
       const result = { success: true, outputFile: conversionRequest.inputFile, processingTime: 1000 };
       const endTime = Date.now();
@@ -194,7 +258,7 @@ describe.skip('Performance Tests', () => {
 
       const startTime = Date.now();
       const session = await videoProcessor.createSession(conversionRequest);
-      await videoProcessor.startConversion(session.sessionId, {});
+      await videoProcessor.startConversion(session.id, createProcessingOptions());
       // Mock conversion result for test
       const result = { success: true, outputFile: conversionRequest.inputFile, processingTime: 1000 };
       const endTime = Date.now();
@@ -223,7 +287,7 @@ describe.skip('Performance Tests', () => {
       });
 
       const session = await videoProcessor.createSession(conversionRequest);
-      await videoProcessor.startConversion(session.sessionId, {});
+      await videoProcessor.startConversion(session.id, createProcessingOptions());
       // Mock conversion result for test
       const result = { success: true, outputFile: conversionRequest.inputFile, processingTime: 1000 };
       
@@ -264,7 +328,7 @@ describe.skip('Performance Tests', () => {
 
       const startTime = Date.now();
       const session = await videoProcessor.createSession(conversionRequest);
-      await videoProcessor.startConversion(session.sessionId, {});
+      await videoProcessor.startConversion(session.id, createProcessingOptions());
       // Mock conversion result for test
       const result = { success: true, outputFile: conversionRequest.inputFile, processingTime: 1000 };
       const endTime = Date.now();
@@ -302,7 +366,7 @@ describe.skip('Performance Tests', () => {
 
         const startTime = Date.now();
         const session = await videoProcessor.createSession(conversionRequest);
-      await videoProcessor.startConversion(session.sessionId, {});
+      await videoProcessor.startConversion(session.id, createProcessingOptions());
       // Mock conversion result for test
       const result = { success: true, outputFile: conversionRequest.inputFile, processingTime: 1000 };
         const endTime = Date.now();
@@ -336,7 +400,7 @@ describe.skip('Performance Tests', () => {
       });
 
       const session = await videoProcessor.createSession(conversionRequest);
-      await videoProcessor.startConversion(session.sessionId, {});
+      await videoProcessor.startConversion(session.id, createProcessingOptions());
 
       // Verify FFmpeg was called with threading optimization
       expect(mockFFmpegKit.executeAsync).toHaveBeenCalledWith(
@@ -366,7 +430,7 @@ describe.skip('Performance Tests', () => {
 
       const RNFS = require('react-native-fs');
       const session = await videoProcessor.createSession(conversionRequest);
-      await videoProcessor.startConversion(session.sessionId, {});
+      await videoProcessor.startConversion(session.id, createProcessingOptions());
       // Mock conversion result for test
       const result = { success: true, outputFile: conversionRequest.inputFile, processingTime: 1000 };
 
@@ -402,7 +466,7 @@ describe.skip('Performance Tests', () => {
       });
 
       const session = await videoProcessor.createSession(conversionRequest);
-      await videoProcessor.startConversion(session.sessionId, {});
+      await videoProcessor.startConversion(session.id, createProcessingOptions());
       // Mock conversion result for test
       const result = { success: true, outputFile: conversionRequest.inputFile, processingTime: 1000 };
       expect(result.success).toBe(true);
@@ -449,7 +513,7 @@ describe.skip('Performance Tests', () => {
       const results = await Promise.all(
         requests.map(async request => {
           const session = await videoProcessor.createSession(request);
-          await videoProcessor.startConversion(session.sessionId, {});
+          await videoProcessor.startConversion(session.id, createProcessingOptions());
           return { success: true, outputFile: request.inputFile, processingTime: 1000 };
         })
       );
@@ -505,12 +569,12 @@ describe.skip('Performance Tests', () => {
       const [lowResult, highResult] = await Promise.all([
         (async () => {
           const session = await videoProcessor.createSession(lowPriorityRequest);
-          await videoProcessor.startConversion(session.sessionId, {});
+          await videoProcessor.startConversion(session.id, createProcessingOptions());
           return { success: true, outputFile: lowPriorityRequest.inputFile, processingTime: 2000 };
         })(),
         (async () => {
           const session = await videoProcessor.createSession(highPriorityRequest);
-          await videoProcessor.startConversion(session.sessionId, {});
+          await videoProcessor.startConversion(session.id, createProcessingOptions());
           return { success: true, outputFile: highPriorityRequest.inputFile, processingTime: 1000 };
         })(),
       ]);
@@ -535,7 +599,8 @@ describe.skip('Performance Tests', () => {
       };
 
       // Mock initial failure, then success on retry
-      (mockFFmpegKit.executeAsync as jest.Mock)
+      const executeAsyncMock = mockFFmpegKit.executeAsync as jest.MockedFunction<any>;
+      executeAsyncMock
         .mockRejectedValueOnce(new Error('FFmpeg error'))
         .mockResolvedValueOnce({
           getReturnCode: () => Promise.resolve({ getValue: () => 0 }),
@@ -544,7 +609,7 @@ describe.skip('Performance Tests', () => {
 
       const startTime = Date.now();
       const session = await videoProcessor.createSession(conversionRequest);
-      await videoProcessor.startConversion(session.sessionId, {});
+      await videoProcessor.startConversion(session.id, createProcessingOptions());
       // Mock conversion result for test
       const result = { success: true, outputFile: conversionRequest.inputFile, processingTime: 1000 };
       const endTime = Date.now();

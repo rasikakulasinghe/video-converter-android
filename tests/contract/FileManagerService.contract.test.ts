@@ -53,7 +53,7 @@ describe('FileManagerService Contract Tests (Simplified)', () => {
 
     // Test basic operations don't throw
     await expect(fileManager.exists('/test/path')).resolves.toBeDefined();
-    
+
     // Cleanup
     fileManager = null as any;
   });

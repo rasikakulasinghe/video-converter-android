@@ -33,6 +33,8 @@ export interface ConversionQualityPreset {
   };
 }
 
+export type ConversionPriority = 'low' | 'normal' | 'high' | 'urgent';
+
 export interface ConversionRequest {
   id: string;
   inputFile: VideoFile;
@@ -41,6 +43,7 @@ export interface ConversionRequest {
   targetQuality: VideoQuality;
   options?: ConversionOptions;
   createdAt: Date;
+  priority?: ConversionPriority;
 }
 
 // Constants for validation
