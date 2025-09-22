@@ -29,11 +29,12 @@
       "package": "com.videoconverter.expo",
       "versionCode": 1,
       "permissions": [
-        "CAMERA",
-        "RECORD_AUDIO",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "MANAGE_EXTERNAL_STORAGE"
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.MANAGE_EXTERNAL_STORAGE",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
     },
     "web": {
@@ -78,8 +79,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "video-converter-expo"
+        "projectId": "4f223b24-1950-43bd-9c7f-20661ddd81d5"
       }
-    }
+    },
+    "owner": "rasikakulasinghe"
   }
 }
