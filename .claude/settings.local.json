@@ -23,7 +23,9 @@
       "Bash(node:*)",
       "Bash(rm:*)",
       "Bash(npx:*)",
-      "Bash(cloc:*)"
+      "Bash(cloc:*)",
+      "Bash(dir src)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []

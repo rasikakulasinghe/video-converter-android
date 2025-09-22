@@ -15,6 +15,9 @@
     "allowUnreachableCode": false,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -49,6 +52,7 @@
     "App.tsx",
     "nativewind-env.d.ts",
     "react-native-types.d.ts",
+    "global.d.ts",
     "**/*.ts",
     "**/*.tsx"
   ],
