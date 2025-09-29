@@ -4,6 +4,7 @@
  */
 
 import { VideoFile, VideoFormat, VideoQuality } from './index';
+import { OutputQuality, CompressionLevel } from './AppSettings';
 
 /**
  * Conversion status enumeration
@@ -16,26 +17,6 @@ export enum ConversionStatus {
   FAILED = 'failed',
   CANCELLED = 'cancelled',
   PAUSED = 'paused',
-}
-
-/**
- * Compression level enumeration
- */
-export enum CompressionLevel {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  MAXIMUM = 'maximum',
-}
-
-/**
- * Output quality enumeration
- */
-export enum OutputQuality {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  ULTRA = 'ultra',
 }
 
 /**

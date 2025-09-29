@@ -5,17 +5,7 @@
  * Following constitutional requirements for TypeScript excellence and interfaces
  */
 
-import { OutputFormat } from './index';
-
-/**
- * Video format options for conversion output
- */
-export enum VideoFormat {
-  MP4 = 'mp4',
-  WEBM = 'webm',
-  MOV = 'mov',
-  AVI = 'avi',
-}
+import { VideoFormat, OutputFormat } from './index';
 
 /**
  * Output quality levels for video conversion

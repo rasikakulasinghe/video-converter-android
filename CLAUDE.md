@@ -23,13 +23,10 @@ npm run build:android:preview       # Preview APK build
 npm run build:android               # Production app bundle
 ```
 
-### Quality & Testing
+### Quality
 ```bash
 npm run lint                        # ESLint code analysis
 npm run typecheck                   # TypeScript type checking
-npm test                           # Run Jest test suite
-npm test -- --watch               # Run tests in watch mode
-npm test -- --coverage            # Generate coverage report
 ```
 
 ## Architecture Overview
@@ -40,7 +37,6 @@ npm test -- --coverage            # Generate coverage report
 - **NativeWind 2.0** for Tailwind CSS styling
 - **Google Media3** for hardware-accelerated video processing
 - **Zustand 4.4** for state management
-- **Jest + React Native Testing Library** for testing
 
 ### Directory Structure
 ```
@@ -108,11 +104,6 @@ All components use:
   - Secondary: `#3a7ca5`
   - Neutral: `#d9dcd6`
 
-### Testing Requirements
-- **70% coverage threshold** - For branches, functions, lines, statements
-- **Jest + RNTL** - React Native Testing Library for component tests
-- **Test location**: Tests in `src/**/*.test.tsx` or `tests/` directory
-- **Mock strategy**: Comprehensive mocks for React Native modules
 
 ### File Organization
 - **Atomic structure** - Components organized by complexity level
@@ -155,11 +146,6 @@ The app integrates with a custom Android native module for video processing:
 - **Resource cleanup**: Automatic session cleanup and temporary file removal
 - **Device adaptation**: Quality settings adjust based on device capabilities
 
-### Testing Strategy
-- **Component tests**: Focus on user interactions and prop handling
-- **Service tests**: Mock native modules for video processing logic
-- **Integration tests**: End-to-end conversion workflows
-- **Performance tests**: Memory and processing speed validation
 
 ## Important File Locations
 
@@ -168,4 +154,3 @@ The app integrates with a custom Android native module for video processing:
 - `src/types/models/` - All TypeScript type definitions
 - `android/app/build.gradle` - Android build configuration
 - `app.json` - Expo configuration with permissions
-- `jest.config.js` - Test configuration with coverage thresholds

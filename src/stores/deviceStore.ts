@@ -7,87 +7,107 @@ import {
   PerformanceMetrics,
   ResourceAlert,
   DeviceCapabilityCheck,
+  BatteryInfo,
+  MemoryInfo,
+  DeviceStorageInfo,
 } from '../services/DeviceMonitorService';
 
-// Basic device monitor implementation for now (simplified)
-class BasicDeviceMonitor {
-  async startMonitoring(): Promise<void> {}
-  async stopMonitoring(): Promise<void> {}
-  async getThermalState(): Promise<ThermalState> { return ThermalState.NOMINAL; }
-  async startThermalMonitoring(): Promise<any> { return { stop: () => {} }; }
-  async stopThermalMonitoring(): Promise<void> {}
-  async getBatteryInfo(): Promise<any> { return { level: 1, isCharging: false }; }
-  async getMemoryInfo(): Promise<any> { return { totalRAM: 8000000000, availableRAM: 4000000000, usedRAM: 4000000000 }; }
-  async getStorageInfo(): Promise<any> { return { totalSpace: 64000000000, availableSpace: 32000000000 }; }
+/**
+ * Minimal device monitor implementation
+ * TODO: Replace with actual native module integration
+ */
+class MockDeviceMonitor implements Partial<DeviceMonitorService> {
+  async startMonitoring(): Promise<void> {
+    // TODO: Implement actual device monitoring
+  }
+
+  async stopMonitoring(): Promise<void> {
+    // TODO: Implement monitoring cleanup
+  }
+
+  async getThermalState(): Promise<ThermalState> {
+    return ThermalState.NOMINAL;
+  }
+
+  async getBatteryInfo(): Promise<BatteryInfo> {
+    return {
+      level: 0.8,
+      isCharging: false,
+      chargingSource: null,
+      temperature: 25,
+      voltage: 3.8,
+      health: 'Good',
+      timeRemaining: null,
+      estimatedTimeToFull: null,
+      powerSaveMode: false,
+    };
+  }
+
+  async getMemoryInfo(): Promise<MemoryInfo> {
+    const totalRAM = 8 * 1024 * 1024 * 1024; // 8GB
+    const usedRAM = 4 * 1024 * 1024 * 1024; // 4GB
+    const availableRAM = totalRAM - usedRAM;
+    return {
+      totalRAM,
+      availableRAM,
+      usedRAM,
+      freeRAM: availableRAM,
+      usagePercentage: (usedRAM / totalRAM) * 100,
+      appMemoryUsage: 512 * 1024 * 1024, // 512MB
+      systemMemoryUsage: usedRAM - 512 * 1024 * 1024,
+      cacheMemoryUsage: 256 * 1024 * 1024, // 256MB
+      swapUsage: 0,
+      memoryPressure: 'normal',
+    };
+  }
+
+  async getStorageInfo(): Promise<DeviceStorageInfo> {
+    const totalSpace = 128 * 1024 * 1024 * 1024; // 128GB
+    const availableSpace = 64 * 1024 * 1024 * 1024; // 64GB
+    const usedSpace = totalSpace - availableSpace;
+    return {
+      totalSpace,
+      usedSpace,
+      availableSpace,
+      usagePercentage: (usedSpace / totalSpace) * 100,
+      location: 'internal',
+      path: '/storage/emulated/0',
+    };
+  }
+
   async getPerformanceMetrics(): Promise<PerformanceMetrics> {
     return {
-      sessionId: 'basic_session',
+      sessionId: Date.now().toString(),
       startTime: new Date(),
       endTime: new Date(),
       averageCpuUsage: 30,
       peakCpuUsage: 50,
-      averageMemoryUsage: 40,
-      peakMemoryUsage: 60,
+      averageMemoryUsage: 50,
+      peakMemoryUsage: 70,
       thermalEvents: 0,
       batteryDrain: 5,
       alertsTriggered: 0,
-      performanceScore: 90,
+      performanceScore: 85,
     };
   }
+
   async checkDeviceCapabilities(): Promise<DeviceCapabilityCheck> {
     return {
       canEncodeVideo: true,
       canDecodeVideo: true,
-      supportedCodecs: ['h264', 'hevc'],
+      supportedCodecs: ['h264', 'hevc', 'vp8', 'vp9'],
       maxVideoResolution: '1080p',
       maxFrameRate: 60,
       supportsHardwareAcceleration: Platform.OS === 'android',
-      thermalMonitoringAvailable: true,
+      thermalMonitoringAvailable: Platform.OS === 'android',
       batteryMonitoringAvailable: true,
       memoryMonitoringAvailable: true,
     };
   }
-  async getResourceAlerts(): Promise<ResourceAlert[]> { return []; }
-  onResourceAlert(): () => void { return () => {}; }
-  onDeviceEvent(): () => void { return () => {}; }
-  async optimizeForVideoProcessing(): Promise<void> {}
-  async restoreNormalPerformance(): Promise<void> {}
-  async isLowPowerMode(): Promise<boolean> { return false; }
-  async enableLowPowerMode(): Promise<void> {}
-  async disableLowPowerMode(): Promise<void> {}
-  
-  // Add missing methods to satisfy interface
-  async startBatteryMonitoring(): Promise<any> { return { stop: () => {} }; }
-  async stopBatteryMonitoring(): Promise<void> {}
-  async startMemoryMonitoring(): Promise<any> { return { stop: () => {} }; }
-  async stopMemoryMonitoring(): Promise<void> {}
-  async startStorageMonitoring(): Promise<any> { return { stop: () => {} }; }
-  async stopStorageMonitoring(): Promise<void> {}
-  async startPerformanceMonitoring(): Promise<any> { return { stop: () => {} }; }
-  async stopPerformanceMonitoring(): Promise<void> {}
-  async getCpuInfo(): Promise<any> { return { cores: 8, frequency: 2400 }; }
-  async getNetworkInfo(): Promise<any> { return { type: 'wifi', speed: 100 }; }
-  async getPowerState(): Promise<any> { return { isLowPowerMode: false, batteryOptimized: false }; }
-  async getDeviceHealth(): Promise<any> { return { status: 'healthy', score: 95 }; }
-  async updatePerformanceProfile(): Promise<void> {}
-  async getOptimizationRecommendations(): Promise<any[]> { return []; }
-  async applyOptimization(): Promise<void> {}
-  async revertOptimization(): Promise<void> {}
-  async getActiveOptimizations(): Promise<any[]> { return []; }
-  async setResourceThreshold(): Promise<void> {}
-  async clearResourceThreshold(): Promise<void> {}
-  async getResourceThresholds(): Promise<any[]> { return []; }
-  async getResourceUsageHistory(): Promise<any[]> { return []; }
-  async clearResourceUsageHistory(): Promise<void> {}
-  async exportPerformanceReport(): Promise<string> { return ''; }
-  async checkHardwareFeature(): Promise<any> { return { available: true, supported: true }; }
-  async getAvailableFeatures(): Promise<any[]> { return []; }
-  async enableFeature(): Promise<void> {}
-  async disableFeature(): Promise<void> {}
-  async getFeatureStatus(): Promise<any> { return { enabled: true }; }
-  async resetToDefaults(): Promise<void> {}
-  async validateConfiguration(): Promise<boolean> { return true; }
-  async getConfigurationSummary(): Promise<any> { return {}; }
+
+  async getResourceAlerts(): Promise<ResourceAlert[]> {
+    return [];
+  }
 }
 
 /**
@@ -113,7 +133,7 @@ interface DeviceState {
   reset: () => void;
 }
 
-const deviceMonitor = new BasicDeviceMonitor();
+const deviceMonitor = new MockDeviceMonitor();
 
 /**
  * Device monitoring store with Zustand
