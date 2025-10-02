@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run type checking
+npm run typecheck:fast
+
+# Run linting on staged files
+npm run lint:fast
+
+# Check for console statements
+npm run lint:console
+
+# Exit with error if any command failed

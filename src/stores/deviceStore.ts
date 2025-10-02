@@ -1,114 +1,19 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { Platform } from 'react-native';
 import {
-  DeviceMonitorService,
   ThermalState,
   PerformanceMetrics,
   ResourceAlert,
   DeviceCapabilityCheck,
-  BatteryInfo,
-  MemoryInfo,
-  DeviceStorageInfo,
 } from '../services/DeviceMonitorService';
+import { AndroidDeviceMonitor } from '../services/implementations/AndroidDeviceMonitor';
+import { ErrorLogger, ErrorSeverity } from '../services/ErrorLogger';
 
 /**
- * Minimal device monitor implementation
- * TODO: Replace with actual native module integration
+ * Device monitor service instance
+ * Uses real Android device monitoring implementation
  */
-class MockDeviceMonitor implements Partial<DeviceMonitorService> {
-  async startMonitoring(): Promise<void> {
-    // TODO: Implement actual device monitoring
-  }
-
-  async stopMonitoring(): Promise<void> {
-    // TODO: Implement monitoring cleanup
-  }
-
-  async getThermalState(): Promise<ThermalState> {
-    return ThermalState.NOMINAL;
-  }
-
-  async getBatteryInfo(): Promise<BatteryInfo> {
-    return {
-      level: 0.8,
-      isCharging: false,
-      chargingSource: null,
-      temperature: 25,
-      voltage: 3.8,
-      health: 'Good',
-      timeRemaining: null,
-      estimatedTimeToFull: null,
-      powerSaveMode: false,
-    };
-  }
-
-  async getMemoryInfo(): Promise<MemoryInfo> {
-    const totalRAM = 8 * 1024 * 1024 * 1024; // 8GB
-    const usedRAM = 4 * 1024 * 1024 * 1024; // 4GB
-    const availableRAM = totalRAM - usedRAM;
-    return {
-      totalRAM,
-      availableRAM,
-      usedRAM,
-      freeRAM: availableRAM,
-      usagePercentage: (usedRAM / totalRAM) * 100,
-      appMemoryUsage: 512 * 1024 * 1024, // 512MB
-      systemMemoryUsage: usedRAM - 512 * 1024 * 1024,
-      cacheMemoryUsage: 256 * 1024 * 1024, // 256MB
-      swapUsage: 0,
-      memoryPressure: 'normal',
-    };
-  }
-
-  async getStorageInfo(): Promise<DeviceStorageInfo> {
-    const totalSpace = 128 * 1024 * 1024 * 1024; // 128GB
-    const availableSpace = 64 * 1024 * 1024 * 1024; // 64GB
-    const usedSpace = totalSpace - availableSpace;
-    return {
-      totalSpace,
-      usedSpace,
-      availableSpace,
-      usagePercentage: (usedSpace / totalSpace) * 100,
-      location: 'internal',
-      path: '/storage/emulated/0',
-    };
-  }
-
-  async getPerformanceMetrics(): Promise<PerformanceMetrics> {
-    return {
-      sessionId: Date.now().toString(),
-      startTime: new Date(),
-      endTime: new Date(),
-      averageCpuUsage: 30,
-      peakCpuUsage: 50,
-      averageMemoryUsage: 50,
-      peakMemoryUsage: 70,
-      thermalEvents: 0,
-      batteryDrain: 5,
-      alertsTriggered: 0,
-      performanceScore: 85,
-    };
-  }
-
-  async checkDeviceCapabilities(): Promise<DeviceCapabilityCheck> {
-    return {
-      canEncodeVideo: true,
-      canDecodeVideo: true,
-      supportedCodecs: ['h264', 'hevc', 'vp8', 'vp9'],
-      maxVideoResolution: '1080p',
-      maxFrameRate: 60,
-      supportsHardwareAcceleration: Platform.OS === 'android',
-      thermalMonitoringAvailable: Platform.OS === 'android',
-      batteryMonitoringAvailable: true,
-      memoryMonitoringAvailable: true,
-    };
-  }
-
-  async getResourceAlerts(): Promise<ResourceAlert[]> {
-    return [];
-  }
-}
+const deviceMonitor = new AndroidDeviceMonitor();
 
 /**
  * Simplified device monitoring store
@@ -133,8 +38,6 @@ interface DeviceState {
   reset: () => void;
 }
 
-const deviceMonitor = new MockDeviceMonitor();
-
 /**
  * Device monitoring store with Zustand
  */
@@ -157,7 +60,7 @@ export const useDeviceStore = create<DeviceState>()(
         set({ isMonitoring: true });
         await get().updateMetrics();
       } catch (error) {
-        console.error('Failed to start monitoring:', error);
+        ErrorLogger.logActionError('DeviceStore', 'start monitoring', error, ErrorSeverity.HIGH);
       }
     },
 
@@ -166,7 +69,7 @@ export const useDeviceStore = create<DeviceState>()(
         await deviceMonitor.stopMonitoring();
         set({ isMonitoring: false });
       } catch (error) {
-        console.error('Failed to stop monitoring:', error);
+        ErrorLogger.logActionError('DeviceStore', 'stop monitoring', error, ErrorSeverity.MEDIUM);
       }
     },
 
@@ -188,7 +91,7 @@ export const useDeviceStore = create<DeviceState>()(
           performanceMetrics,
         });
       } catch (error) {
-        console.error('Failed to update metrics:', error);
+        ErrorLogger.logActionError('DeviceStore', 'update metrics', error, ErrorSeverity.MEDIUM);
       }
     },
 
@@ -197,7 +100,7 @@ export const useDeviceStore = create<DeviceState>()(
         const capabilities = await deviceMonitor.checkDeviceCapabilities();
         set({ deviceCapabilities: capabilities });
       } catch (error) {
-        console.error('Failed to check capabilities:', error);
+        ErrorLogger.logActionError('DeviceStore', 'check capabilities', error, ErrorSeverity.LOW);
       }
     },
 

@@ -25,7 +25,12 @@
       "Bash(npx:*)",
       "Bash(cloc:*)",
       "Bash(dir src)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(dir:*)",
+      "Read(//d/**)",
+      "Bash(rmdir:*)",
+      "Bash(npm run typecheck:fast:*)",
+      "Bash(node_modules/.bin/tsc:*)"
     ],
     "deny": [],
     "ask": []

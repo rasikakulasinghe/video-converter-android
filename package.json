@@ -18,12 +18,16 @@
     "lint": "eslint .",
     "lint:fast": "mv .eslintrc.json .eslintrc.json.tmp && eslint src/ --config .eslintrc.fast.js --max-warnings 100 --format compact --cache; mv .eslintrc.json.tmp .eslintrc.json",
     "lint:fix": "eslint src/ --fix --max-warnings 0",
+    "lint:console": "grep -rn \"console\\.\" src/ --exclude-dir=node_modules || echo 'No console statements found'",
+    "lint:todos": "grep -rn \"TODO\\|FIXME\" src/ || echo 'No TODOs found'",
     "typecheck": "tsc --noEmit",
     "typecheck:fast": "tsc --noEmit --incremental --skipLibCheck",
     "dev:check": "npm run typecheck:fast && npm run lint:fast",
     "dev:fix": "npm run lint:fix && npm run typecheck:fast",
+    "prebuild:prod": "npm run lint && npm run typecheck && npm run lint:console",
     "perf:test": "node scripts/performance-test.js",
-    "clean": "rm -rf node_modules/.cache .expo android/.gradle android/app/build .tsbuildinfo coverage dist build"
+    "clean": "rm -rf node_modules/.cache .expo android/.gradle android/app/build .tsbuildinfo coverage dist build",
+    "clean:temp": "rm -rf temp/ *.log claudedocs/temp*"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.23.1",

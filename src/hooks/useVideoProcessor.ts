@@ -68,7 +68,7 @@ export const useVideoProcessor = (
   const handleConversionEvent = useCallback((event: ConversionEvent) => {
     switch (event.type) {
       case ConversionEventType.SESSION_CREATED:
-        console.log('Conversion session created');
+        // Session created - no action needed
         break;
       
       case ConversionEventType.CONVERSION_STARTED:

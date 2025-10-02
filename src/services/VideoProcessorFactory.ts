@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import { VideoProcessorService } from './VideoProcessorService';
 import { Media3VideoProcessor } from './implementations/Media3VideoProcessor';
+import { ErrorLogger, ErrorSeverity } from './ErrorLogger';
 
 /**
  * Factory for creating video processor instances
@@ -21,7 +22,6 @@ export class VideoProcessorFactory {
       if (Platform.OS === 'android') {
         // Use Media3 for Android
         this.instance = new Media3VideoProcessor();
-        console.log('Using Media3VideoProcessor for Android');
       } else {
         // For iOS, we would need to implement AVFoundation-based processor
         // For now, throw an error
@@ -30,7 +30,7 @@ export class VideoProcessorFactory {
 
       return this.instance;
     } catch (error) {
-      console.error('Failed to initialize video processor:', error);
+      ErrorLogger.logCritical('VideoProcessorFactory', 'Failed to initialize video processor', error);
 
       // In the future, you could add fallback logic here
       // For example, falling back to a cloud-based processing service

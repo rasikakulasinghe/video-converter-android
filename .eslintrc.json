@@ -11,9 +11,12 @@
     "react-native/react-native": true
   },
   "rules": {
-    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
     "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/no-explicit-any": "error"
+    "@typescript-eslint/no-explicit-any": "error",
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "no-debugger": "error",
+    "no-warning-comments": ["warn", { "terms": ["TODO", "FIXME", "XXX"], "location": "start" }]
   },
   "ignorePatterns": [
     "android/",
