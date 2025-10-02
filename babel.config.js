@@ -1,11 +1,16 @@
 module.exports = function (api) {
-  api.cache(true);
+  // Detect web platform from caller BEFORE setting cache
+  const isWeb = api.caller((caller) => caller?.platform === 'web');
+
+  // Cache configuration based on platform
+  api.cache.using(() => isWeb ? 'web' : 'native');
+
   return {
     presets: [
-      ['babel-preset-expo', { jsxImportSource: 'nativewind' }],
+      ['babel-preset-expo', isWeb ? {} : { jsxImportSource: 'nativewind' }],
     ],
     plugins: [
-      'nativewind/babel',
+      ...(isWeb ? [] : ['nativewind/babel']),
       'react-native-reanimated/plugin',
     ],
   };
