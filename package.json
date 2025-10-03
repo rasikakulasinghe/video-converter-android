@@ -9,8 +9,6 @@
   "scripts": {
     "start": "expo start --dev-client",
     "android": "expo run:android",
-    "ios": "expo run:ios",
-    "web": "expo start --web",
     "build:android": "eas build --platform android",
     "build:android:preview": "eas build --platform android --profile preview",
     "build:android:development": "eas build --platform android --profile development",
@@ -27,7 +25,8 @@
     "prebuild:prod": "npm run lint && npm run typecheck && npm run lint:console",
     "perf:test": "node scripts/performance-test.js",
     "clean": "rm -rf node_modules/.cache .expo android/.gradle android/app/build .tsbuildinfo coverage dist build",
-    "clean:temp": "rm -rf temp/ *.log claudedocs/temp*"
+    "clean:temp": "rm -rf temp/ *.log claudedocs/temp*",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",
