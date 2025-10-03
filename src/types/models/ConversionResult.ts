@@ -1,4 +1,5 @@
-import { ConversionStatus, VideoFile } from './index';
+import { VideoFile } from './index';
+import { ConversionStatus } from './ConversionJob';
 import type { ConversionRequest } from './ConversionRequest';
 
 // Type definitions for this module

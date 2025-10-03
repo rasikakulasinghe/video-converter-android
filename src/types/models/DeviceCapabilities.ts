@@ -4,7 +4,7 @@
  * and processing capability evaluation for video conversion optimization.
  */
 
-import { VideoQuality } from './index';
+import { VideoQuality } from './enums';
 
 /**
  * Thermal throttling states for device temperature management

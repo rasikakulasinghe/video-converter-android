@@ -3,7 +3,8 @@
  * Handles video conversion job management, progress tracking, and result handling.
  */
 
-import { VideoFile, VideoFormat, VideoQuality } from './index';
+import { VideoFile } from './index';
+import { VideoFormat, VideoQuality } from './enums';
 import { OutputQuality, CompressionLevel } from './AppSettings';
 
 /**
