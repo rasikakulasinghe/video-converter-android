@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { ScrollView, View, Alert, Pressable } from 'react-native';
+import { ScrollView, View, Alert, Pressable, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NavigationProp } from '@react-navigation/native';
 
@@ -204,53 +204,53 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
   const renderDeviceStatus = () => {
     if (thermalState === 'critical' || thermalState === 'serious') {
       return (
-        <View className="mx-4 mb-4 p-3 bg-red-100 rounded-lg border border-red-300">
-          <Text className="text-red-700 text-sm font-medium">
+        <View style={styles.warningContainer}>
+          <Text style={styles.warningTextDanger}>
             ⚠️ Device is overheating. Please let it cool down before converting.
           </Text>
         </View>
       );
     }
-    
+
     if (availableStorage !== null && availableStorage < 1000000000) { // Less than 1GB
       return (
-        <View className="mx-4 mb-4 p-3 bg-yellow-100 rounded-lg border border-yellow-300">
-          <Text className="text-yellow-700 text-sm font-medium">
+        <View style={styles.cautionContainer}>
+          <Text style={styles.warningTextCaution}>
             ⚠️ Low storage space. Consider freeing up space before converting.
           </Text>
         </View>
       );
     }
-    
+
     return null;
   };
-  
+
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       {/* Header */}
-      <View className="px-4 py-6 border-b border-gray-200">
-        <View className="flex-row items-center justify-between">
-          <Text className="text-2xl font-bold text-gray-900">
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>
             Video Converter
           </Text>
           <Pressable
             onPress={handleOpenSettings}
-            className="p-2 rounded-lg bg-gray-100"
+            style={styles.settingsButton}
           >
-            <Text className="text-gray-600">⚙️</Text>
+            <Text style={styles.settingsIcon}>⚙️</Text>
           </Pressable>
         </View>
-        <Text className="text-gray-600 mt-1">
+        <Text style={styles.headerSubtitle}>
           Convert videos to web-optimized MP4
         </Text>
       </View>
-      
+
       {/* Device Status Warnings */}
       {renderDeviceStatus()}
-      
+
       {/* Progress Card */}
       {isProcessing && currentJob && (
-        <View className="mx-4 mb-4">
+        <View style={styles.progressContainer}>
           <ProgressCard
             videoFile={{
               filename: currentJob.request.inputFile.name,
@@ -269,13 +269,13 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
           />
         </View>
       )}
-      
+
       {/* Main Content */}
-      <ScrollView className="flex-1 px-4">
+      <ScrollView style={styles.scrollView}>
         {/* File Selection */}
-        <View className="mb-6">
-          <View className="flex-row items-center justify-between mb-3">
-            <Text className="text-lg font-semibold text-gray-900">
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>
               Selected Files ({selectedFiles.length})
             </Text>
             {selectedVideoFiles.length > 0 && (
@@ -288,11 +288,11 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
               </Button>
             )}
           </View>
-          
+
           {selectedFiles.length === 0 ? (
-            <View className="py-12 items-center">
-              <Text className="text-6xl mb-4">📹</Text>
-              <Text className="text-gray-500 text-center mb-4">
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>📹</Text>
+              <Text style={styles.emptyText}>
                 No videos selected{'\n'}
                 Tap the button below to get started
               </Text>
@@ -304,7 +304,7 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
               </Button>
             </View>
           ) : (
-            <View className="space-y-3">
+            <View style={styles.fileList}>
               {selectedVideoFiles.map((file) => (
                 <FileCard
                   key={file.id}
@@ -313,7 +313,7 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
                   onPress={() => handleFilePress(file)}
                 />
               ))}
-              
+
               <Button
                 variant="secondary"
                 onPress={handleSelectFiles}
@@ -323,10 +323,10 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
             </View>
           )}
         </View>
-        
+
         {/* Conversion Controls */}
         {selectedVideoFiles.length > 0 && !isProcessing && (
-          <View className="mb-6">
+          <View style={styles.section}>
             <Button
               variant="primary"
               onPress={() => setShowConversionForm(true)}
@@ -336,12 +336,12 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
             </Button>
           </View>
         )}
-        
+
         {/* Recent Results */}
         {processedFiles.length > 0 && (
-          <View className="mb-6">
-            <View className="flex-row items-center justify-between mb-3">
-              <Text className="text-lg font-semibold text-gray-900">
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>
                 Recent Results ({processedFiles.length})
               </Text>
               <Button
@@ -352,8 +352,8 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
                 View All
               </Button>
             </View>
-            
-            <View className="space-y-3">
+
+            <View style={styles.fileList}>
               {processedFiles.slice(0, 3).map((file) => (
                 <FileCard
                   key={file.id}
@@ -398,3 +398,106 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  header: {
+    paddingHorizontal: 16,
+    paddingVertical: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#111827',
+  },
+  headerSubtitle: {
+    color: '#6b7280',
+    marginTop: 4,
+  },
+  settingsButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#f3f4f6',
+  },
+  settingsIcon: {
+    fontSize: 20,
+    color: '#6b7280',
+  },
+  warningContainer: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    padding: 12,
+    backgroundColor: '#fee2e2',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#fca5a5',
+  },
+  warningTextDanger: {
+    color: '#b91c1c',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  cautionContainer: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    padding: 12,
+    backgroundColor: '#fef3c7',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#fde047',
+  },
+  warningTextCaution: {
+    color: '#a16207',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  progressContainer: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  scrollView: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  emptyState: {
+    paddingVertical: 48,
+    alignItems: 'center',
+  },
+  emptyIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  emptyText: {
+    color: '#6b7280',
+    textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  fileList: {
+    gap: 12,
+  },
+});

@@ -39,7 +39,9 @@
       "Bash(tasklist:*)",
       "Bash(cmd /c \"taskkill /F /PID 14904 && taskkill /F /PID 19316\")",
       "Bash(timeout:*)",
-      "Bash(cmd /c:*)"
+      "Bash(cmd /c:*)",
+      "Read(//c/Users/user/OneDrive/Desktop/**)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": [],
     "ask": []

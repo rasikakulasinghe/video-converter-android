@@ -8,9 +8,6 @@ import { ResultsScreen } from './src/screens/ResultsScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import type { RootStackParamList } from './src/types/navigation';
 
-// Import NativeWind styles
-import './global.css';
-
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
