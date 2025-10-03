@@ -25,6 +25,8 @@ import {
   ConversionProgress,
   VideoFormat,
   ErrorSeverity,
+  ConversionSettings,
+  CompressionLevel,
 } from '../../types/models';
 import { DeviceCapabilities, ThermalState } from '../../types/models/DeviceCapabilities';
 
@@ -457,7 +459,7 @@ export class Media3VideoProcessor implements VideoProcessorService {
 
   async estimateOutputSize(request: ConversionRequest): Promise<number> {
     const inputSize = request.inputFile.size;
-    const qualityMultiplier = this.getQualityMultiplier(request.targetQuality);
+    const qualityMultiplier = this.getQualityMultiplierFromSettings(request.settings);
 
     return Math.round(inputSize * qualityMultiplier);
   }
@@ -586,11 +588,13 @@ export class Media3VideoProcessor implements VideoProcessorService {
       },
     };
 
+    const processingTime = (event.timestamp - session.createdAt.getTime()) / 1000; // in seconds
+
     session.result = {
-      id: event.sessionId,
-      request: session.request,
-      status: ConversionStatus.COMPLETED,
-      progress: {
+      success: true,
+      outputFile,
+      processingTime,
+      finalProgress: {
         percentage: 100,
         currentFrame: 0,
         totalFrames: 0,
@@ -600,14 +604,8 @@ export class Media3VideoProcessor implements VideoProcessorService {
         currentBitrate: 0,
         averageFps: 0,
       },
-      startTime: session.createdAt,
-      endTime: new Date(event.timestamp),
-      outputFile,
-      stats: {
-        compressionRatio: session.request.inputFile.size / event.fileSize,
-        processingDuration: event.timestamp - session.createdAt.getTime(),
-        averageSpeed: event.duration / (event.timestamp - session.createdAt.getTime()),
-      },
+      completedAt: new Date(event.timestamp),
+      compressionRatio: session.request.inputFile.size / event.fileSize,
     };
 
     const conversionEvent: ConversionEvent = {
@@ -661,30 +659,14 @@ export class Media3VideoProcessor implements VideoProcessorService {
       outputPath: request.outputPath,
     };
 
-    // Map quality settings
-    if (request.targetQuality) {
-      const dimensions = this.getQualityDimensions(request.targetQuality);
-      config.quality = {
-        width: dimensions.width,
-        height: dimensions.height,
-      };
-    }
+    // Map quality settings from ConversionSettings
+    config.quality = {
+      width: request.settings.maxWidth,
+      height: request.settings.maxHeight,
+    };
 
-    // Map options
-    if (request.options) {
-      if (request.options.startTime !== undefined && request.options.endTime !== undefined) {
-        config.trim = {
-          startTime: request.options.startTime / 1000, // Convert to seconds
-          endTime: request.options.endTime / 1000,
-        };
-      }
-
-      if (request.options.cropParams) {
-        config.crop = request.options.cropParams;
-      }
-
-      config.preserveAudio = request.options.preserveAudio ?? true;
-    }
+    // Preserve audio by default
+    config.preserveAudio = true;
 
     return config;
   }
@@ -722,17 +704,8 @@ export class Media3VideoProcessor implements VideoProcessorService {
   }
 
   private getComplexityMultiplier(request: ConversionRequest): number {
-    let multiplier = 1.0;
-
-    if (request.options?.startTime !== undefined || request.options?.endTime !== undefined) {
-      multiplier *= 1.2; // Trimming adds complexity
-    }
-
-    if (request.options?.cropParams) {
-      multiplier *= 1.3; // Cropping adds complexity
-    }
-
-    return multiplier;
+    // Base complexity multiplier
+    return 1.0;
   }
 
   private getQualityMultiplier(quality: VideoQuality): number {
@@ -750,6 +723,19 @@ export class Media3VideoProcessor implements VideoProcessorService {
       default:
         return 0.8;
     }
+  }
+
+  private getQualityMultiplierFromSettings(settings: ConversionSettings): number {
+    // Estimate based on target bitrate and compression
+    const baseBitrate = 2000000; // 2 Mbps baseline
+    const bitrateRatio = settings.targetBitrate / baseBitrate;
+
+    // Adjust based on compression level
+    const compressionMultiplier = settings.compression === CompressionLevel.HIGH ? 0.7 :
+                                  settings.compression === CompressionLevel.MEDIUM ? 0.85 :
+                                  settings.compression === CompressionLevel.LOW ? 1.0 : 0.85;
+
+    return bitrateRatio * compressionMultiplier;
   }
 
   private mapToVideoQuality(quality: string): VideoQuality {

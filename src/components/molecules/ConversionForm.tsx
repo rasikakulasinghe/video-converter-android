@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text } from '../atoms/Text';
 import { Button } from '../atoms/Button';
-import { ConversionSettings } from '../../types/models';
+import { ConversionSettings, VideoFormat, OutputQuality, CompressionLevel } from '../../types/models';
 
 /**
  * Props for the ConversionForm component
@@ -37,10 +37,14 @@ export const ConversionForm: React.FC<ConversionFormProps> = ({
   testID = 'conversion-form',
 }) => {
   const [settings, setSettings] = useState<ConversionSettings>({
-    quality: 'medium',
-    format: 'mp4',
+    outputFormat: VideoFormat.MP4,
+    quality: OutputQuality.MEDIUM,
+    compression: CompressionLevel.MEDIUM,
+    targetBitrate: 2000000,
+    maxWidth: 1920,
+    maxHeight: 1080,
+    maintainAspectRatio: true,
     audioCodec: 'aac',
-    preserveMetadata: true,
     ...initialValues,
   });
 
@@ -68,7 +72,7 @@ export const ConversionForm: React.FC<ConversionFormProps> = ({
         <View>
           <Text className="text-sm font-medium mb-2">Quality</Text>
           <View className="flex-row space-x-2">
-            {(['low', 'medium', 'high'] as const).map((quality) => (
+            {([OutputQuality.LOW, OutputQuality.MEDIUM, OutputQuality.HIGH, OutputQuality.ULTRA] as const).map((quality) => (
               <Button
                 key={quality}
                 variant={settings.quality === quality ? 'primary' : 'outline'}
@@ -85,12 +89,12 @@ export const ConversionForm: React.FC<ConversionFormProps> = ({
         <View>
           <Text className="text-sm font-medium mb-2">Format</Text>
           <View className="flex-row space-x-2">
-            {(['mp4', 'webm'] as const).map((format) => (
+            {([VideoFormat.MP4, VideoFormat.MOV, VideoFormat.AVI, VideoFormat.MKV] as const).map((format) => (
               <Button
                 key={format}
-                variant={settings.format === format ? 'primary' : 'outline'}
+                variant={settings.outputFormat === format ? 'primary' : 'outline'}
                 size="sm"
-                onPress={() => updateSetting('format', format)}
+                onPress={() => updateSetting('outputFormat', format)}
               >
                 {format.toUpperCase()}
               </Button>
@@ -98,18 +102,18 @@ export const ConversionForm: React.FC<ConversionFormProps> = ({
           </View>
         </View>
 
-        {/* Audio Codec Selection */}
+        {/* Compression Selection */}
         <View>
-          <Text className="text-sm font-medium mb-2">Audio Codec</Text>
+          <Text className="text-sm font-medium mb-2">Compression</Text>
           <View className="flex-row space-x-2">
-            {(['aac', 'mp3'] as const).map((codec) => (
+            {([CompressionLevel.LOW, CompressionLevel.MEDIUM, CompressionLevel.HIGH] as const).map((compression) => (
               <Button
-                key={codec}
-                variant={settings.audioCodec === codec ? 'primary' : 'outline'}
+                key={compression}
+                variant={settings.compression === compression ? 'primary' : 'outline'}
                 size="sm"
-                onPress={() => updateSetting('audioCodec', codec)}
+                onPress={() => updateSetting('compression', compression)}
               >
-                {codec.toUpperCase()}
+                {compression.charAt(0).toUpperCase() + compression.slice(1)}
               </Button>
             ))}
           </View>

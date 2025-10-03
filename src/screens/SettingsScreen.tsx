@@ -9,6 +9,7 @@ import { Switch } from '../components/atoms/Switch';
 
 import type { RootStackParamList } from '../types/navigation';
 import type { ConversionSettings } from '../types/models';
+import { OutputQuality, CompressionLevel, VideoFormat } from '../types/models';
 
 interface SettingsScreenProps {}
 
@@ -22,10 +23,14 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
   
   // Local state for settings (simplified for now)
   const [conversionSettings, setConversionSettings] = useState<ConversionSettings>({
-    quality: 'medium',
-    format: 'mp4',
+    outputFormat: VideoFormat.MP4,
+    quality: OutputQuality.MEDIUM,
+    compression: CompressionLevel.MEDIUM,
+    targetBitrate: 2000000,
+    maxWidth: 1920,
+    maxHeight: 1080,
+    maintainAspectRatio: true,
     audioCodec: 'aac',
-    preserveMetadata: true,
   });
   
   const [deviceSettings, setDeviceSettings] = useState({
@@ -107,10 +112,14 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
           style: 'destructive',
           onPress: () => {
             setConversionSettings({
-              quality: 'medium',
-              format: 'mp4',
+              outputFormat: VideoFormat.MP4,
+              quality: OutputQuality.MEDIUM,
+              compression: CompressionLevel.MEDIUM,
+              targetBitrate: 2000000,
+              maxWidth: 1920,
+              maxHeight: 1080,
+              maintainAspectRatio: true,
               audioCodec: 'aac',
-              preserveMetadata: true,
             });
             setDeviceSettings({
               pauseOnLowBattery: true,
@@ -198,7 +207,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
                 Output Quality
               </Text>
               <View style={styles.buttonRow}>
-                {(['low', 'medium', 'high'] as const).map((quality) => (
+                {([OutputQuality.LOW, OutputQuality.MEDIUM, OutputQuality.HIGH, OutputQuality.ULTRA] as const).map((quality) => (
                   <Pressable
                     key={quality}
                     onPress={() => handleUpdateConversionSettings({ quality })}
@@ -209,7 +218,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
                   >
                     <Text
                       style={
-                        conversionSettings.quality === quality 
+                        conversionSettings.quality === quality
                           ? {...styles.optionButtonText, ...styles.optionButtonTextActive}
                           : styles.optionButtonText
                       }
@@ -227,18 +236,18 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
                 Output Format
               </Text>
               <View style={styles.buttonRow}>
-                {(['mp4', 'webm'] as const).map((format) => (
+                {([VideoFormat.MP4, VideoFormat.MOV, VideoFormat.AVI, VideoFormat.MKV] as const).map((format) => (
                   <Pressable
                     key={format}
-                    onPress={() => handleUpdateConversionSettings({ format })}
+                    onPress={() => handleUpdateConversionSettings({ outputFormat: format })}
                     style={[
                       styles.optionButton,
-                      conversionSettings.format === format && styles.optionButtonActive,
+                      conversionSettings.outputFormat === format && styles.optionButtonActive,
                     ]}
                   >
                     <Text
                       style={
-                        conversionSettings.format === format 
+                        conversionSettings.outputFormat === format
                           ? {...styles.optionButtonText, ...styles.optionButtonTextActive}
                           : styles.optionButtonText
                       }
@@ -279,20 +288,20 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
               </View>
             </View>
             
-            {/* Preserve Metadata */}
+            {/* Maintain Aspect Ratio */}
             <View style={styles.switchRow}>
               <View style={styles.switchLabel}>
                 <Text style={styles.fieldLabel}>
-                  Preserve Metadata
+                  Maintain Aspect Ratio
                 </Text>
                 <Text style={styles.fieldDescription}>
-                  Keep original file information like creation date and location
+                  Keep original video proportions during conversion
                 </Text>
               </View>
               <Switch
-                value={conversionSettings.preserveMetadata}
-                onValueChange={(value) => 
-                  handleUpdateConversionSettings({ preserveMetadata: value })
+                value={conversionSettings.maintainAspectRatio}
+                onValueChange={(value) =>
+                  handleUpdateConversionSettings({ maintainAspectRatio: value })
                 }
               />
             </View>

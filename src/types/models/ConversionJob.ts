@@ -22,24 +22,27 @@ export enum ConversionStatus {
 
 /**
  * Conversion progress information
+ * Unified definition for all conversion tracking
  */
 export interface ConversionProgress {
   /** Current progress percentage (0.0 to 100.0) */
   percentage: number;
-  /** Processed frames */
-  processedFrames: number;
+  /** Current frame being processed */
+  currentFrame: number;
   /** Total frames to process */
   totalFrames: number;
-  /** Current processing step */
-  currentStep: string;
-  /** Elapsed time in seconds */
-  timeElapsed: number;
+  /** Processed duration in seconds */
+  processedDuration: number;
+  /** Total duration in seconds */
+  totalDuration: number;
   /** Estimated time remaining in seconds */
-  timeRemaining: number;
-  /** Current processing speed (fps) */
-  currentFps: number;
+  estimatedTimeRemaining: number;
+  /** Current bitrate in bps */
+  currentBitrate: number;
   /** Average processing speed (fps) */
   averageFps: number;
+  /** Current processing step (optional) */
+  currentStep?: string;
   /** Bytes processed so far (optional) */
   bytesProcessed?: number;
   /** Total bytes to process (optional) */

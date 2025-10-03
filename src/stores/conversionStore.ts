@@ -15,7 +15,8 @@ import {
   ConversionResult,
   ConversionProgress,
   ConversionStatus,
-  ErrorSeverity
+  ErrorSeverity,
+  ConversionSessionResult,
 } from '../types/models';
 import { ThermalState } from '../types/models/DeviceCapabilities';
 
@@ -135,9 +136,9 @@ interface ConversionActions {
   // Progress tracking
   updateProgress: (jobId: string, progress: Partial<ConversionJob['progress']>) => void;
   updateJobStatus: (jobId: string, status: ConversionJob['status'], error?: string) => void;
-  
+
   // Statistics
-  updateStats: (jobResult: ConversionResult) => void;
+  updateStats: (jobResult: ConversionSessionResult) => void;
   resetStats: () => void;
   
   // Settings
@@ -319,9 +320,9 @@ export const useConversionStore = create<ConversionStore>()(
 
         // Get the final session status
         const finalSession = await videoProcessor.getSessionStatus(session.id);
-        
-        // Create result from session data
-        const result: ConversionResult = {
+
+        // Create session result from session data
+        const sessionResult: ConversionSessionResult = {
           id: finalSession.id,
           request: finalSession.request,
           status: finalSession.state === SessionState.COMPLETED ? ConversionStatus.COMPLETED : ConversionStatus.FAILED,
@@ -344,17 +345,23 @@ export const useConversionStore = create<ConversionStore>()(
               message: finalSession.error.message,
               severity: ErrorSeverity.CRITICAL,
               timestamp: new Date(),
-              ...(finalSession.error.details && { details: finalSession.error.details }),
+              ...(finalSession.error.details && { stack: finalSession.error.details }),
             }
           } : {}),
-          ...(finalSession.result?.stats ? { stats: finalSession.result.stats } : {}),
+          ...(finalSession.result?.compressionRatio && finalSession.completedAt && finalSession.result?.processingTime ? {
+            stats: {
+              compressionRatio: finalSession.result.compressionRatio,
+              processingDuration: finalSession.result.processingTime * 1000, // Convert to ms
+              averageSpeed: finalSession.progress.totalDuration / (finalSession.result.processingTime * 1000),
+            }
+          } : {}),
         };
 
         // Handle successful completion
         const completedJob: ConversionJob = {
           ...job,
           status: 'completed',
-          result,
+          result: finalSession.result,
           endTime: new Date(),
           progress: { ...job.progress, percentage: 100 },
         };
@@ -367,7 +374,7 @@ export const useConversionStore = create<ConversionStore>()(
         }));
 
         // Update statistics
-        get().updateStats(result);
+        get().updateStats(sessionResult);
 
         // Process next in queue if auto-start is enabled
         if (get().autoStartQueue && get().queue.length > 0) {
@@ -614,7 +621,7 @@ export const useConversionStore = create<ConversionStore>()(
       });
     },
 
-    updateStats: (jobResult: ConversionResult): void => {
+    updateStats: (jobResult: ConversionSessionResult): void => {
       set(state => {
         const newStats = { ...state.stats };
         

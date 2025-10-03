@@ -2,6 +2,9 @@
  * Main types index file for Video Converter Android App
  */
 
+// Import enums to use in interfaces
+import { VideoFormat } from './enums';
+
 // Export enums from separate file to prevent circular dependencies
 export { VideoQuality, VideoFormat, OutputFormat } from './enums';
 
@@ -10,6 +13,9 @@ export { ConversionStatus } from './ConversionJob';
 
 // Export ThermalState from DeviceCapabilities
 export { ThermalState } from './DeviceCapabilities';
+
+// Export AppSettings enums
+export { OutputQuality, CompressionLevel, Theme, StorageLocation, PerformanceMode } from './AppSettings';
 
 export interface VideoMetadata {
   duration: number;
@@ -37,27 +43,22 @@ export interface VideoFile {
   metadata: VideoMetadata;
 }
 
-export interface ConversionSettings {
-  quality: 'low' | 'medium' | 'high';
-  format: 'mp4' | 'webm';
-  audioCodec: 'aac' | 'mp3';
-  preserveMetadata: boolean;
-}
-
-// Export all the main types
+// Export ConversionJob types (includes ConversionProgress, ConversionSettings)
 export type {
-  ConversionRequest,
-  ConversionValidationResult,
-  ConversionQualityPreset,
-  ConversionOptions,
-  ConversionPriority
-} from './ConversionRequest';
-
-export type {
-  ConversionResult,
-  ConversionResultValidationResult,
   ConversionProgress,
-  ConversionError
+  ConversionSettings,
+  ConversionRequest,
+  ConversionResult,
+  ConversionJob,
+  ConversionQueue,
+  BatchConversionConfig
+} from './ConversionJob';
+
+// Export ConversionResult utility types and functions
+export type {
+  ConversionSessionResult,
+  ConversionError,
+  ConversionResultValidationResult
 } from './ConversionResult';
 
 export { ErrorSeverity } from './ConversionResult';

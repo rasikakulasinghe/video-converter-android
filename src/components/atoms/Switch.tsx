@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, View, StyleSheet } from 'react-native';
 
 interface SwitchProps {
   value: boolean;
@@ -26,15 +26,47 @@ export const Switch: React.FC<SwitchProps> = ({
     <Pressable
       onPress={handlePress}
       disabled={disabled}
-      className={`w-12 h-6 rounded-full p-1 ${
-        value ? 'bg-blue-600' : 'bg-gray-300'
-      } ${disabled ? 'opacity-50' : ''}`}
+      style={[
+        styles.container,
+        value ? styles.containerActive : styles.containerInactive,
+        disabled && styles.containerDisabled,
+      ]}
     >
       <View
-        className={`w-4 h-4 rounded-full bg-white transition-transform duration-200 ${
-          value ? 'translate-x-6' : 'translate-x-0'
-        }`}
+        style={[
+          styles.thumb,
+          value && styles.thumbActive,
+        ]}
       />
     </Pressable>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    width: 48,
+    height: 24,
+    borderRadius: 12,
+    padding: 2,
+    justifyContent: 'center',
+  },
+  containerActive: {
+    backgroundColor: '#2563eb', // blue-600
+  },
+  containerInactive: {
+    backgroundColor: '#d1d5db', // gray-300
+  },
+  containerDisabled: {
+    opacity: 0.5,
+  },
+  thumb: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    transform: [{ translateX: 0 }],
+  },
+  thumbActive: {
+    transform: [{ translateX: 24 }],
+  },
+});

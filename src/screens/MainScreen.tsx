@@ -118,20 +118,18 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
     try {
       // Process the first file for now (single file conversion)
       if (selectedVideoFiles.length === 0) return;
-      
+
       const firstFile = selectedVideoFiles[0];
       if (!firstFile) return; // Type guard
-      
+
       const request: ConversionRequest = {
         id: `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         inputFile: firstFile,
         outputPath: `${firstFile.path.replace(/\.[^/.]+$/, "")}_converted.mp4`,
-        targetQuality: settings.quality === 'low' ? VideoQuality.SD : 
-                       settings.quality === 'medium' ? VideoQuality.HD : VideoQuality.FULL_HD,
-        outputFormat: settings.format === 'mp4' ? OutputFormat.MP4 : OutputFormat.MP4,
+        settings: settings,
         createdAt: new Date(),
       };
-      
+
       await startConversion(request);
       setShowConversionForm(false);
     } catch (error) {
@@ -141,7 +139,7 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
         [{ text: 'OK' }]
       );
     }
-  }, [selectedFiles, startConversion]);
+  }, [selectedVideoFiles, startConversion]);
   
   // Handle conversion cancellation
   const handleCancelConversion = useCallback(async () => {

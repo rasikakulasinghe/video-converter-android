@@ -1,6 +1,6 @@
 import { VideoFile } from './index';
-import { ConversionStatus } from './ConversionJob';
-import type { ConversionRequest } from './ConversionRequest';
+import { ConversionStatus, ConversionProgress } from './ConversionJob';
+import type { ConversionRequest } from './ConversionJob';
 
 // Type definitions for this module
 export enum ErrorSeverity {
@@ -18,23 +18,16 @@ export interface ConversionError {
   stack?: string;
 }
 
-export interface ConversionProgress {
-  percentage: number;
-  currentFrame: number;
-  totalFrames: number;
-  processedDuration: number;
-  totalDuration: number;
-  estimatedTimeRemaining: number;
-  currentBitrate: number;
-  averageFps: number;
-}
-
 export interface ConversionResultValidationResult {
   isValid: boolean;
   errors: string[];
 }
 
-export interface ConversionResult {
+/**
+ * Extended conversion result with full tracking information
+ * Used by the conversion service and stores for detailed progress tracking
+ */
+export interface ConversionSessionResult {
   id: string;
   request: ConversionRequest;
   status: ConversionStatus;
@@ -51,11 +44,11 @@ export interface ConversionResult {
 }
 
 /**
- * Validates a ConversionResult for correctness and compliance
+ * Validates a ConversionSessionResult for correctness and compliance
  * @param result - The conversion result to validate
  * @returns Validation result with errors if any
  */
-export function validateConversionResult(result: ConversionResult): ConversionResultValidationResult {
+export function validateConversionResult(result: ConversionSessionResult): ConversionResultValidationResult {
   const errors: string[] = [];
 
   // Validate required fields
@@ -130,7 +123,7 @@ function validateProgress(progress: ConversionProgress): string[] {
     errors.push('Total frames cannot be negative');
   }
 
-  // Validate durations
+  // Validate durations (in seconds)
   if (progress.processedDuration < 0) {
     errors.push('Processed duration cannot be negative');
   }
@@ -250,7 +243,7 @@ export function formatConversionDuration(duration: number): string {
  * @param result - Conversion result to check
  * @returns True if conversion is completed successfully
  */
-export function isConversionComplete(result: ConversionResult): boolean {
+export function isConversionComplete(result: ConversionSessionResult): boolean {
   return result.status === ConversionStatus.COMPLETED;
 }
 
@@ -259,7 +252,7 @@ export function isConversionComplete(result: ConversionResult): boolean {
  * @param result - Conversion result to check
  * @returns True if conversion has failed or been cancelled
  */
-export function isConversionFailed(result: ConversionResult): boolean {
+export function isConversionFailed(result: ConversionSessionResult): boolean {
   return result.status === ConversionStatus.FAILED || result.status === ConversionStatus.CANCELLED;
 }
 
@@ -277,7 +270,7 @@ export function getErrorSeverity(error: ConversionError): ErrorSeverity {
  * @param result - Conversion result
  * @returns Processing speed as real-time ratio (1.0 = real-time)
  */
-export function calculateProcessingSpeed(result: ConversionResult): number {
+export function calculateProcessingSpeed(result: ConversionSessionResult): number {
   if (!result.endTime || !result.request.inputFile.metadata.duration) {
     return 0;
   }
@@ -297,7 +290,7 @@ export function calculateProcessingSpeed(result: ConversionResult): number {
  * @param result - Completed conversion result
  * @returns Conversion statistics summary
  */
-export function createConversionSummary(result: ConversionResult): string {
+export function createConversionSummary(result: ConversionSessionResult): string {
   if (!isConversionComplete(result) || !result.outputFile || !result.stats) {
     return 'Conversion not completed';
   }
@@ -314,7 +307,7 @@ export function createConversionSummary(result: ConversionResult): string {
  * @param result - Conversion result to check
  * @returns True if conversion can be resumed
  */
-export function canResumeConversion(result: ConversionResult): boolean {
+export function canResumeConversion(result: ConversionSessionResult): boolean {
   return result.status === ConversionStatus.PAUSED && result.progress.percentage < 100;
 }
 
@@ -323,6 +316,6 @@ export function canResumeConversion(result: ConversionResult): boolean {
  * @param result - Conversion result to check
  * @returns True if conversion can be cancelled
  */
-export function canCancelConversion(result: ConversionResult): boolean {
+export function canCancelConversion(result: ConversionSessionResult): boolean {
   return result.status === ConversionStatus.PROCESSING || result.status === ConversionStatus.PAUSED;
 }
