@@ -240,11 +240,11 @@ export const FileCard: React.FC<FileCardProps> = ({
         <Text variant="caption" color="muted" testID={`${testID}-size`}>
           {formatFileSize(file.size)}
         </Text>
-        <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>•</Text>
+        <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>{"•"}</Text>
         <Text variant="caption" color="muted" testID={`${testID}-duration`}>
           {formatDuration(file.metadata.duration)}
         </Text>
-        <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>•</Text>
+        <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>{"•"}</Text>
         <Text variant="caption" color="muted" testID={`${testID}-format`}>
           {file.mimeType.split('/')[1]?.toUpperCase() || 'VIDEO'}
         </Text>
@@ -254,13 +254,13 @@ export const FileCard: React.FC<FileCardProps> = ({
         <Text variant="caption" color="muted" testID={`${testID}-resolution`}>
           {`${file.metadata.width}x${file.metadata.height}`}
         </Text>
-        <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>•</Text>
+        <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>{"•"}</Text>
         <Text variant="caption" color="muted" testID={`${testID}-codec`}>
           {file.metadata.codec}
         </Text>
         {file.metadata.audioCodec && (
           <>
-            <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>•</Text>
+            <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>{"•"}</Text>
             <Icon name="check" size="sm" color="success" />
             <Text variant="caption" color="success" style={{ marginLeft: 2 }}>Audio</Text>
           </>
