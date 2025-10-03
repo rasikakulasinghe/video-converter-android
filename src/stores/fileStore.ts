@@ -24,7 +24,7 @@ import {
   ThumbnailResult,
   FileValidationResult,
 } from '../services/FileManagerService';
-import { ReactNativeFileManager } from '../services/implementations/ReactNativeFileManager';
+import { FileManagerFactory } from '../services/FileManagerFactory';
 import { VideoFile } from '../types/models';
 
 /**
@@ -138,8 +138,8 @@ interface FileState {
   clearHistory: () => void;
 }
 
-// Create service instance
-const fileManagerService: FileManagerService = new ReactNativeFileManager() as unknown as FileManagerService;
+// Create service instance using factory (handles platform-specific implementations)
+const fileManagerService: FileManagerService = FileManagerFactory.getInstance();
 
 // Default thumbnail options
 const defaultThumbnailOptions: ThumbnailOptions = {

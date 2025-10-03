@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import { VideoProcessorService } from './VideoProcessorService';
 import { Media3VideoProcessor } from './implementations/Media3VideoProcessor';
+import { MockVideoProcessor } from './implementations/MockVideoProcessor';
 import { ErrorLogger, ErrorSeverity } from './ErrorLogger';
 
 /**
@@ -22,23 +23,35 @@ export class VideoProcessorFactory {
       if (Platform.OS === 'android') {
         // Use Media3 for Android
         this.instance = new Media3VideoProcessor();
+      } else if (Platform.OS === 'web' || Platform.OS === 'ios') {
+        // Use mock processor for web and iOS (graceful degradation)
+        // Web: Video processing requires native capabilities
+        // iOS: AVFoundation processor not yet implemented
+        this.instance = new MockVideoProcessor();
+        ErrorLogger.logError(
+          'VideoProcessorFactory',
+          `Video processing not available on ${Platform.OS}, using mock processor`,
+          new Error('Platform not supported'),
+          ErrorSeverity.MEDIUM
+        );
       } else {
-        // For iOS, we would need to implement AVFoundation-based processor
-        // For now, throw an error
-        throw new Error('iOS video processing not implemented yet');
+        // Unknown platform fallback
+        this.instance = new MockVideoProcessor();
+        ErrorLogger.logError(
+          'VideoProcessorFactory',
+          `Unknown platform ${Platform.OS}, using mock processor`,
+          new Error('Unknown platform'),
+          ErrorSeverity.HIGH
+        );
       }
 
       return this.instance;
     } catch (error) {
       ErrorLogger.logCritical('VideoProcessorFactory', 'Failed to initialize video processor', error);
 
-      // In the future, you could add fallback logic here
-      // For example, falling back to a cloud-based processing service
-      // or a simple file manipulation service
-
-      throw new Error(
-        `Video processing is not available on this platform: ${(error as Error).message}`
-      );
+      // Fallback to mock processor on any initialization error
+      this.instance = new MockVideoProcessor();
+      return this.instance;
     }
   }
 

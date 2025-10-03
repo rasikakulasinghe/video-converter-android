@@ -107,8 +107,8 @@ interface ConversionState {
   notifyOnCompletion: boolean;
   deleteOriginalsAfterConversion: boolean;
   
-  // Service instance
-  videoProcessor: VideoProcessorService;
+  // Service instance (lazy initialized)
+  videoProcessor: VideoProcessorService | null;
 }
 
 /**
@@ -194,11 +194,17 @@ export const useConversionStore = create<ConversionStore>()(
     autoStartQueue: false,
     notifyOnCompletion: true,
     deleteOriginalsAfterConversion: false,
-    videoProcessor: VideoProcessorFactory.getInstance(),
+    videoProcessor: null, // Lazy initialization to prevent startup errors
 
     // Actions
     startConversion: async (request: ConversionRequest): Promise<string> => {
-      const { videoProcessor, currentJob } = get();
+      // Lazy initialize video processor on first use
+      let { videoProcessor, currentJob } = get();
+
+      if (!videoProcessor) {
+        videoProcessor = VideoProcessorFactory.getInstance();
+        set({ videoProcessor });
+      }
 
       // Check if already processing
       if (currentJob && currentJob.status === 'processing') {

@@ -1,3 +1,4 @@
+import './global.css';
 import React from 'react';
 import { Platform, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
