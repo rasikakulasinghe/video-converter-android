@@ -42,7 +42,9 @@
       "Bash(cmd /c:*)",
       "Read(//c/Users/user/OneDrive/Desktop/**)",
       "Bash(npm uninstall:*)",
-      "Bash(npm run clean:*)"
+      "Bash(npm run clean:*)",
+      "Bash(\"./android/gradlew.bat\" --stop)",
+      "Bash(\"./android/gradlew.bat\" clean -p android)"
     ],
     "deny": [],
     "ask": []

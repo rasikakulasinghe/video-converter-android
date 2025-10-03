@@ -56,27 +56,53 @@ export const useFileManager = (): UseFileManagerReturn => {
           }
 
           const files: VideoFile[] = [];
-          
+
           if (response.assets) {
             response.assets.forEach((asset: any) => {
               if (asset.uri && asset.fileName && asset.fileSize && asset.duration) {
+                // Determine format and codec from file extension and MIME type
+                const fileName = asset.fileName.toLowerCase();
+                const mimeType = asset.type || 'video/mp4';
+
+                let format = VideoFormat.MP4;
+                let codec = 'h264';
+                let codecName = 'H.264';
+
+                if (fileName.endsWith('.mov') || mimeType.includes('quicktime')) {
+                  format = VideoFormat.MOV;
+                  codec = 'h264';
+                  codecName = 'H.264';
+                } else if (fileName.endsWith('.avi')) {
+                  format = VideoFormat.AVI;
+                  codec = 'mpeg4';
+                  codecName = 'MPEG-4';
+                } else if (fileName.endsWith('.mkv') || mimeType.includes('matroska')) {
+                  format = VideoFormat.MKV;
+                  codec = 'h264';
+                  codecName = 'H.264';
+                } else if (fileName.endsWith('.webm')) {
+                  format = VideoFormat.WEBM;
+                  codec = 'vp9';
+                  codecName = 'VP9';
+                }
+
                 files.push({
                   id: `${Date.now()}_${Math.random()}`,
                   name: asset.fileName,
                   path: asset.uri,
                   size: asset.fileSize,
-                  mimeType: asset.type || 'video/mp4',
-                  format: VideoFormat.MP4, // Default format
+                  mimeType,
+                  format,
                   createdAt: new Date(),
                   modifiedAt: new Date(),
                   metadata: {
                     duration: (asset.duration || 0) * 1000, // Convert to milliseconds
-                    width: asset.width || 0,
-                    height: asset.height || 0,
+                    width: asset.width || 1920,
+                    height: asset.height || 1080,
                     frameRate: 30, // Default value
-                    bitrate: 0, // Unknown at selection
-                    codec: 'unknown',
-                    codecName: 'unknown',
+                    bitrate: Math.floor((asset.fileSize * 8) / (asset.duration || 1)), // Estimate bitrate
+                    codec,
+                    codecName,
                   },
                 });
               }
@@ -118,24 +144,49 @@ export const useFileManager = (): UseFileManagerReturn => {
   const getFileInfo = useCallback(async (filePath: string): Promise<VideoFile | null> => {
     try {
       const stats = await RNFS.stat(filePath);
-      
+      const fileName = (stats.name || 'unknown').toLowerCase();
+
+      // Determine format and codec from file extension
+      let format = VideoFormat.MP4;
+      let codec = 'h264';
+      let codecName = 'H.264';
+      let mimeType = 'video/mp4';
+
+      if (fileName.endsWith('.mov')) {
+        format = VideoFormat.MOV;
+        mimeType = 'video/quicktime';
+      } else if (fileName.endsWith('.avi')) {
+        format = VideoFormat.AVI;
+        codec = 'mpeg4';
+        codecName = 'MPEG-4';
+        mimeType = 'video/x-msvideo';
+      } else if (fileName.endsWith('.mkv')) {
+        format = VideoFormat.MKV;
+        mimeType = 'video/x-matroska';
+      } else if (fileName.endsWith('.webm')) {
+        format = VideoFormat.WEBM;
+        codec = 'vp9';
+        codecName = 'VP9';
+        mimeType = 'video/webm';
+      }
+
       return {
         id: `file_${Date.now()}`,
         name: stats.name || 'unknown',
         path: filePath,
         size: stats.size,
-        mimeType: 'video/mp4', // Default, would need proper detection
-        format: VideoFormat.MP4, // Default format
+        mimeType,
+        format,
         createdAt: new Date(stats.ctime),
         modifiedAt: new Date(stats.mtime),
         metadata: {
           duration: 0, // Would need video metadata extraction
-          width: 0,
-          height: 0,
+          width: 1920,
+          height: 1080,
           frameRate: 30,
           bitrate: 0,
-          codec: 'unknown',
-          codecName: 'unknown',
+          codec,
+          codecName,
         },
       };
     } catch (error) {

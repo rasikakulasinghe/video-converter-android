@@ -21,8 +21,21 @@ export class VideoProcessorFactory {
 
     try {
       if (Platform.OS === 'android') {
-        // Use Media3 for Android
-        this.instance = new Media3VideoProcessor();
+        // Try to use Media3 for Android, fall back to mock if native module not available
+        try {
+          this.instance = new Media3VideoProcessor();
+          console.log('VideoProcessorFactory: Using Media3VideoProcessor');
+        } catch (nativeError) {
+          // Native module not available - use mock processor
+          this.instance = new MockVideoProcessor();
+          console.warn('VideoProcessorFactory: Media3 native module not found, using MockVideoProcessor for development');
+          ErrorLogger.logError(
+            'VideoProcessorFactory',
+            'Media3 native module not available, using mock processor',
+            nativeError as Error,
+            ErrorSeverity.LOW
+          );
+        }
       } else if (Platform.OS === 'web' || Platform.OS === 'ios') {
         // Use mock processor for web and iOS (graceful degradation)
         // Web: Video processing requires native capabilities
@@ -47,7 +60,7 @@ export class VideoProcessorFactory {
 
       return this.instance;
     } catch (error) {
-      ErrorLogger.logCritical('VideoProcessorFactory', 'Failed to initialize video processor', error);
+      ErrorLogger.logError('VideoProcessorFactory', 'Unexpected error during initialization', error as Error, ErrorSeverity.MEDIUM);
 
       // Fallback to mock processor on any initialization error
       this.instance = new MockVideoProcessor();

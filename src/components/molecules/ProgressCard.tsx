@@ -36,8 +36,8 @@ export interface ConversionProgress {
   estimatedTimeRemaining?: number;
   /** Current processing phase */
   phase: 'analyzing' | 'converting' | 'optimizing' | 'finalizing';
-  /** Processing speed (e.g., "2.5x") */
-  speed?: string;
+  /** Processing speed (number for multiplier or string for display like "2.5x") */
+  speed?: string | number;
   /** Processed frames */
   processedFrames?: number;
   /** Total frames */
@@ -243,11 +243,15 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
             <Text variant="caption" color="muted" testID={`${testID}-file-size`}>
               {formatFileSize(videoFile.size)}
             </Text>
-            <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>•</Text>
+            <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>
+              {"•"}
+            </Text>
             <Text variant="caption" color="muted" testID={`${testID}-duration`}>
               {formatDuration(videoFile.duration)}
             </Text>
-            <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>•</Text>
+            <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>
+              {"•"}
+            </Text>
             <Text variant="caption" color="muted" testID={`${testID}-resolution`}>
               {videoFile.resolution}
             </Text>
@@ -315,22 +319,24 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
               }}
             >
               <Text variant="caption" color="muted" testID={`${testID}-progress-percentage`}>
-                {Math.round(progress.percentage)}% complete
+                {`${Math.round(progress.percentage)}% complete`}
               </Text>
               
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                {progress.speed && (
+                {progress.speed != null && (
                   <>
                     <Text variant="caption" color="muted" testID={`${testID}-speed`}>
-                      {progress.speed}
+                      {typeof progress.speed === 'number' ? `${progress.speed.toFixed(1)}x` : progress.speed}
                     </Text>
-                    <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>•</Text>
+                    <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>
+                      {"•"}
+                    </Text>
                   </>
                 )}
                 
                 {progress.estimatedTimeRemaining && (
                   <Text variant="caption" color="muted" testID={`${testID}-time-remaining`}>
-                    {formatTimeRemaining(progress.estimatedTimeRemaining)} remaining
+                    {`${formatTimeRemaining(progress.estimatedTimeRemaining)} remaining`}
                   </Text>
                 )}
               </View>
@@ -345,7 +351,7 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
               style={{ marginTop: 4 }}
               testID={`${testID}-frame-progress`}
             >
-              Frame {progress.processedFrames.toLocaleString()} of {progress.totalFrames.toLocaleString()}
+              {`Frame ${progress.processedFrames.toLocaleString()} of ${progress.totalFrames.toLocaleString()}`}
             </Text>
           )}
         </View>

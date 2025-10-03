@@ -256,7 +256,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
           </Text>
           {!indeterminate && (
             <Text variant={textVariant} color="secondary">
-              {clampedValue} / {max}
+              {`${Math.round(clampedValue)} / ${Math.round(max)}`}
             </Text>
           )}
         </View>

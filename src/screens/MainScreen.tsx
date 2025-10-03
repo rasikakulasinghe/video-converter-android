@@ -249,15 +249,15 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
       {renderDeviceStatus()}
 
       {/* Progress Card */}
-      {isProcessing && currentJob && (
+      {isProcessing && currentJob && currentJob.request?.inputFile && (
         <View style={styles.progressContainer}>
           <ProgressCard
             videoFile={{
-              filename: currentJob.request.inputFile.name,
-              size: currentJob.request.inputFile.size,
-              duration: currentJob.request.inputFile.metadata.duration / 1000,
-              resolution: `${currentJob.request.inputFile.metadata.width}x${currentJob.request.inputFile.metadata.height}`,
-              format: currentJob.request.inputFile.mimeType.split('/')[1]?.toUpperCase() || 'VIDEO'
+              filename: currentJob.request.inputFile.name || 'Unknown',
+              size: currentJob.request.inputFile.size || 0,
+              duration: (currentJob.request.inputFile.metadata?.duration || 0) / 1000,
+              resolution: `${currentJob.request.inputFile.metadata?.width || 0}x${currentJob.request.inputFile.metadata?.height || 0}`,
+              format: currentJob.request.inputFile.mimeType?.split('/')[1]?.toUpperCase() || 'VIDEO'
             }}
             status="converting"
             progress={{

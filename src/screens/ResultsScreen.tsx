@@ -18,51 +18,14 @@ type ResultsRouteProp = RouteProp<RootStackParamList, 'Results'>;
  * Results screen component for the video converter app.
  * Displays processed videos and conversion history.
  */
+import { useFileStore } from '../stores/fileStore';
+
 export const ResultsScreen: React.FC<ResultsScreenProps> = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<ResultsRouteProp>();
-  
-  // Mock processed files for now
-  const processedFiles = [
-    {
-      id: '1',
-      name: 'vacation_video.mp4',
-      path: '/storage/processed/vacation_video.mp4',
-      size: 25600000,
-      mimeType: 'video/mp4',
-      format: VideoFormat.MP4,
-      createdAt: new Date(),
-      modifiedAt: new Date(),
-      metadata: {
-        duration: 120000,
-        width: 1920,
-        height: 1080,
-        frameRate: 30,
-        bitrate: 2500000,
-        codec: 'h264',
-        codecName: 'h264',
-      },
-    },
-    {
-      id: '2',
-      name: 'presentation.mp4',
-      path: '/storage/processed/presentation.mp4',
-      size: 15800000,
-      mimeType: 'video/mp4',
-      format: VideoFormat.MP4,
-      createdAt: new Date(Date.now() - 86400000), // 1 day ago
-      modifiedAt: new Date(Date.now() - 86400000),
-      metadata: {
-        duration: 300000,
-        width: 1280,
-        height: 720,
-        frameRate: 24,
-        bitrate: 1800000,
-        codec: 'h264',
-        codecName: 'h264',
-      },
-    },
-  ];
+
+  // Get actual processed files from store
+  const processedFiles = useFileStore((state) => state.processedFiles);
   
   // Handle back navigation
   const handleGoBack = useCallback(() => {
@@ -113,7 +76,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = () => {
             </View>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>
-                {formatDuration(processedFiles.reduce((total, file) => total + file.metadata.duration, 0))}
+                {formatDuration(processedFiles.reduce((total, file) => total + file.metadata.duration, 0) / 1000)}
               </Text>
               <Text style={styles.statLabel}>Total Duration</Text>
             </View>

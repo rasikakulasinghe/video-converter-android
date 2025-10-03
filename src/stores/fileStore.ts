@@ -313,20 +313,27 @@ export const useFileStore = create<FileState>()(
 
       // Video file management for MainScreen
       addFile: (file: VideoFile): void => {
-        const { processedFiles } = get();
-        const exists = processedFiles.find(f => f.id === file.id);
+        const { videoFiles, selectedFiles } = get();
+        const exists = videoFiles.find(f => f.id === file.id);
         if (!exists) {
-          set({ processedFiles: [...processedFiles, file] });
+          set({
+            videoFiles: [...videoFiles, file],
+            selectedFiles: [...selectedFiles, file.path]
+          });
         }
       },
 
       removeFile: (fileId: string): void => {
-        const { processedFiles } = get();
-        set({ processedFiles: processedFiles.filter(f => f.id !== fileId) });
+        const { videoFiles, selectedFiles } = get();
+        const file = videoFiles.find(f => f.id === fileId);
+        set({
+          videoFiles: videoFiles.filter(f => f.id !== fileId),
+          selectedFiles: file ? selectedFiles.filter(path => path !== file.path) : selectedFiles
+        });
       },
 
       clearFiles: (): void => {
-        set({ processedFiles: [] });
+        set({ videoFiles: [], selectedFiles: [] });
       },
 
       // File operations
