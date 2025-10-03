@@ -1,5 +1,4 @@
 import React from 'react';
-import { Platform, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -12,11 +11,8 @@ import type { RootStackParamList } from './src/types/navigation';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
-  // Use regular View wrapper on web, SafeAreaProvider on native
-  const Wrapper = Platform.OS === 'web' ? View : SafeAreaProvider;
-
   return (
-    <Wrapper style={Platform.OS === 'web' ? { flex: 1 } : undefined}>
+    <SafeAreaProvider>
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Main"
@@ -47,6 +43,6 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </Wrapper>
+    </SafeAreaProvider>
   );
 }
