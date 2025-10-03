@@ -37,7 +37,9 @@
       "Bash(tasklist)",
       "Bash(gradlew.bat:*)",
       "Bash(tasklist:*)",
-      "Bash(cmd /c \"taskkill /F /PID 14904 && taskkill /F /PID 19316\")"
+      "Bash(cmd /c \"taskkill /F /PID 14904 && taskkill /F /PID 19316\")",
+      "Bash(timeout:*)",
+      "Bash(cmd /c:*)"
     ],
     "deny": [],
     "ask": []
