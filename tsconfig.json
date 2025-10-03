@@ -53,7 +53,6 @@
     "src/**/*",
     "index.js",
     "App.tsx",
-    "nativewind-env.d.ts",
     "react-native-types.d.ts",
     "global.d.ts",
     "**/*.ts",
