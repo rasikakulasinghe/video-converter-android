@@ -240,20 +240,8 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
               marginTop: 4,
             }}
           >
-            <Text variant="caption" color="muted" testID={`${testID}-file-size`}>
-              {formatFileSize(videoFile.size)}
-            </Text>
-            <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>
-              •
-            </Text>
-            <Text variant="caption" color="muted" testID={`${testID}-duration`}>
-              {formatDuration(videoFile.duration)}
-            </Text>
-            <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>
-              •
-            </Text>
-            <Text variant="caption" color="muted" testID={`${testID}-resolution`}>
-              {videoFile.resolution}
+            <Text variant="caption" color="muted">
+              {formatFileSize(videoFile.size)} • {formatDuration(videoFile.duration)} • {videoFile.resolution}
             </Text>
           </View>
         </View>
@@ -322,24 +310,13 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
                 {`${Math.round(progress.percentage)}% complete`}
               </Text>
               
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                {progress.speed != null && (
-                  <>
-                    <Text variant="caption" color="muted" testID={`${testID}-speed`}>
-                      {typeof progress.speed === 'number' ? `${progress.speed.toFixed(1)}x` : progress.speed}
-                    </Text>
-                    <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>
-                      •
-                    </Text>
-                  </>
-                )}
-                
-                {progress.estimatedTimeRemaining && (
-                  <Text variant="caption" color="muted" testID={`${testID}-time-remaining`}>
-                    {`${formatTimeRemaining(progress.estimatedTimeRemaining)} remaining`}
-                  </Text>
-                )}
-              </View>
+              {(progress.speed != null || progress.estimatedTimeRemaining) && (
+                <Text variant="caption" color="muted">
+                  {progress.speed != null && (typeof progress.speed === 'number' ? `${progress.speed.toFixed(1)}x` : progress.speed)}
+                  {progress.speed != null && progress.estimatedTimeRemaining && ' • '}
+                  {progress.estimatedTimeRemaining && `${formatTimeRemaining(progress.estimatedTimeRemaining)} remaining`}
+                </Text>
+              )}
             </View>
           )}
 
@@ -366,54 +343,58 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
       >
         {/* Cancel button (shown during conversion) */}
         {(status === 'converting' || status === 'preparing') && onCancel && (
-          <Button
-            variant="outline"
-            size="sm"
-            onPress={onCancel}
-            testID={`${testID}-cancel-button`}
-            style={{ marginLeft: 8 }}
-          >
-            Cancel
-          </Button>
+          <View style={{ marginLeft: 8 }}>
+            <Button
+              variant="outline"
+              size="sm"
+              onPress={onCancel}
+              testID={`${testID}-cancel-button`}
+            >
+              Cancel
+            </Button>
+          </View>
         )}
 
         {/* Retry button (shown on error) */}
         {status === 'error' && onRetry && (
-          <Button
-            variant="primary"
-            size="sm"
-            onPress={onRetry}
-            testID={`${testID}-retry-button`}
-            style={{ marginLeft: 8 }}
-          >
-            Retry
-          </Button>
+          <View style={{ marginLeft: 8 }}>
+            <Button
+              variant="primary"
+              size="sm"
+              onPress={onRetry}
+              testID={`${testID}-retry-button`}
+            >
+              Retry
+            </Button>
+          </View>
         )}
 
         {/* View result button (shown on completion) */}
         {status === 'completed' && onViewResult && (
-          <Button
-            variant="primary"
-            size="sm"
-            onPress={onViewResult}
-            testID={`${testID}-view-result-button`}
-            style={{ marginLeft: 8 }}
-          >
-            View Result
-          </Button>
+          <View style={{ marginLeft: 8 }}>
+            <Button
+              variant="primary"
+              size="sm"
+              onPress={onViewResult}
+              testID={`${testID}-view-result-button`}
+            >
+              View Result
+            </Button>
+          </View>
         )}
 
         {/* Start conversion button (shown when idle) */}
         {status === 'idle' && onStartConversion && (
-          <Button
-            variant="primary"
-            size="md"
-            onPress={onStartConversion}
-            testID={`${testID}-start-button`}
-            style={{ marginLeft: 8 }}
-          >
-            Start Conversion
-          </Button>
+          <View style={{ marginLeft: 8 }}>
+            <Button
+              variant="primary"
+              size="md"
+              onPress={onStartConversion}
+              testID={`${testID}-start-button`}
+            >
+              Start Conversion
+            </Button>
+          </View>
         )}
       </View>
     </View>

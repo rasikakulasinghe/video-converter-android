@@ -32,11 +32,11 @@ import { VideoFile, VideoFormat } from '../../types/models';
  */
 export class MockFileManager implements FileManagerService {
   private createError(operation: string): FileAccessError {
-    return {
-      type: FileAccessErrorType.NOT_SUPPORTED,
-      message: `File operation "${operation}" is not available on this platform. Please use an Android device.`,
-      code: 'PLATFORM_NOT_SUPPORTED',
-    };
+    return new FileAccessError(
+      FileAccessErrorType.OPERATION_NOT_PERMITTED,
+      `File operation "${operation}" is not available on this platform. Please use an Android device.`,
+      'PLATFORM_NOT_SUPPORTED'
+    );
   }
 
   // File operations
@@ -110,9 +110,11 @@ export class MockFileManager implements FileManagerService {
       totalSpace: 0,
       usedSpace: 0,
       availableSpace: 0,
+      freeSpace: 0,
       isRemovable: false,
-      isReadOnly: true,
+      isEmulated: false,
       path: '',
+      state: 'unavailable',
     };
   }
 
@@ -156,10 +158,10 @@ export class MockFileManager implements FileManagerService {
     callback: (event: FileWatchEvent) => void
   ): Promise<FileWatcher> {
     const watcher: FileWatcher = {
-      watcherId: `mock-${Date.now()}`,
-      filePath,
+      id: `mock-${Date.now()}`,
+      path: filePath,
+      isWatching: false,
       events,
-      stop: async () => {},
     };
     return watcher;
   }
@@ -171,15 +173,19 @@ export class MockFileManager implements FileManagerService {
     recursive?: boolean
   ): Promise<FileWatcher> {
     const watcher: FileWatcher = {
-      watcherId: `mock-${Date.now()}`,
-      filePath: directoryPath,
+      id: `mock-${Date.now()}`,
+      path: directoryPath,
+      isWatching: false,
       events,
-      stop: async () => {},
     };
     return watcher;
   }
 
   async unwatchFile(watcherId: string): Promise<void> {
+    // No-op
+  }
+
+  async unwatchDirectory(watcherId: string): Promise<void> {
     // No-op
   }
 
@@ -209,7 +215,79 @@ export class MockFileManager implements FileManagerService {
     return {
       isValid: false,
       errors: ['Video operations not supported on this platform'],
+      warnings: [],
+      fileInfo: null,
     };
+  }
+
+  validateFilePath(filePath: string): boolean {
+    return false;
+  }
+
+  validateFileName(fileName: string): boolean {
+    return false;
+  }
+
+  async getFileMimeType(filePath: string): Promise<string> {
+    return 'application/octet-stream';
+  }
+
+  getFileExtension(fileName: string): string {
+    const parts = fileName.split('.');
+    return parts.length > 1 ? parts[parts.length - 1] : '';
+  }
+
+  sanitizeFileName(fileName: string): string {
+    return fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+  }
+
+  async generateUniqueFileName(basePath: string, fileName: string): Promise<string> {
+    return fileName;
+  }
+
+  async batchMove(operations: { source: string; target: string }[], options?: FileMoveOptions): Promise<FileOperationResult[]> {
+    return operations.map(op => ({
+      success: false,
+      operation: FileOperationType.MOVE,
+      source: op.source,
+      target: op.target,
+      error: 'Platform not supported',
+    }));
+  }
+
+  async batchCopy(operations: { source: string; target: string }[], options?: FileCopyOptions): Promise<FileOperationResult[]> {
+    return operations.map(op => ({
+      success: false,
+      operation: FileOperationType.COPY,
+      source: op.source,
+      target: op.target,
+      error: 'Platform not supported',
+    }));
+  }
+
+  async batchDelete(filePaths: string[], options?: FileDeleteOptions): Promise<FileOperationResult[]> {
+    return filePaths.map(path => ({
+      success: false,
+      operation: FileOperationType.DELETE,
+      source: path,
+      error: 'Platform not supported',
+    }));
+  }
+
+  async findVideoFiles(directoryPath: string, recursive?: boolean): Promise<VideoFile[]> {
+    return [];
+  }
+
+  filterFilesByType(files: FileInfo[], mimeTypes: string[]): FileInfo[] {
+    return [];
+  }
+
+  filterFilesBySize(files: FileInfo[], minSize: number, maxSize: number): FileInfo[] {
+    return [];
+  }
+
+  filterFilesByDate(files: FileInfo[], startDate: Date, endDate: Date): FileInfo[] {
+    return [];
   }
 
   async searchFiles(options: FileSearchOptions): Promise<FileSearchResult[]> {

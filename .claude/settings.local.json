@@ -44,7 +44,8 @@
       "Bash(npm uninstall:*)",
       "Bash(npm run clean:*)",
       "Bash(\"./android/gradlew.bat\" --stop)",
-      "Bash(\"./android/gradlew.bat\" clean -p android)"
+      "Bash(\"./android/gradlew.bat\" clean -p android)",
+      "Bash(exit 0)"
     ],
     "deny": [],
     "ask": []

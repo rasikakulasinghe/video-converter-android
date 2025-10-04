@@ -240,11 +240,11 @@ export const FileCard: React.FC<FileCardProps> = ({
         <Text variant="caption" color="muted" testID={`${testID}-size`}>
           {formatFileSize(file.size)}
         </Text>
-        <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>{"•"}</Text>
+        <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>•</Text>
         <Text variant="caption" color="muted" testID={`${testID}-duration`}>
           {formatDuration(file.metadata.duration)}
         </Text>
-        <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>{"•"}</Text>
+        <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>•</Text>
         <Text variant="caption" color="muted" testID={`${testID}-format`}>
           {file.mimeType.split('/')[1]?.toUpperCase() || 'VIDEO'}
         </Text>
@@ -254,13 +254,13 @@ export const FileCard: React.FC<FileCardProps> = ({
         <Text variant="caption" color="muted" testID={`${testID}-resolution`}>
           {`${file.metadata.width}x${file.metadata.height}`}
         </Text>
-        <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>{"•"}</Text>
+        <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>•</Text>
         <Text variant="caption" color="muted" testID={`${testID}-codec`}>
           {file.metadata.codec}
         </Text>
         {file.metadata.audioCodec && (
           <>
-            <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>{"•"}</Text>
+            <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>•</Text>
             <Icon name="check" size="sm" color="success" />
             <Text variant="caption" color="success" style={{ marginLeft: 2 }}>Audio</Text>
           </>
@@ -307,22 +307,22 @@ export const FileCard: React.FC<FileCardProps> = ({
           borderTopColor: '#e5e5e5',
         }}
       >
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
-          <View style={{ minWidth: 120 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+          <View style={{ minWidth: 120, marginRight: 16, marginBottom: 8 }}>
             <Text variant="caption" color="muted">Bitrate</Text>
             <Text variant="body-small" testID={`${testID}-bitrate`}>
               {formatBitrate(file.metadata.bitrate)}
             </Text>
           </View>
-          
-          <View style={{ minWidth: 80 }}>
+
+          <View style={{ minWidth: 80, marginRight: 16, marginBottom: 8 }}>
             <Text variant="caption" color="muted">FPS</Text>
             <Text variant="body-small" testID={`${testID}-framerate`}>
               {file.metadata.frameRate}
             </Text>
           </View>
-          
-          <View style={{ minWidth: 120 }}>
+
+          <View style={{ minWidth: 120, marginRight: 16, marginBottom: 8 }}>
             <Text variant="caption" color="muted">Created</Text>
             <Text variant="body-small" testID={`${testID}-created`}>
               {formatDate(file.createdAt)}
@@ -330,7 +330,7 @@ export const FileCard: React.FC<FileCardProps> = ({
           </View>
 
           {file.metadata.audioCodec && (
-            <View style={{ minWidth: 80 }}>
+            <View style={{ minWidth: 80, marginRight: 16, marginBottom: 8 }}>
               <Text variant="caption" color="muted">Audio</Text>
               <Text variant="body-small" testID={`${testID}-audio-codec`}>
                 {file.metadata.audioCodec}
@@ -351,46 +351,51 @@ export const FileCard: React.FC<FileCardProps> = ({
           marginTop: 12,
           flexDirection: 'row',
           justifyContent: 'flex-end',
-          gap: 8,
         }}
       >
         {onInfo && (
-          <Button
-            variant="ghost"
-            size="sm"
-            leftIcon={<Icon name="info" size="sm" />}
-            onPress={onInfo}
-            disabled={state === 'disabled'}
-            testID={`${testID}-info-button`}
-          >
-            Info
-          </Button>
+          <View style={{ marginLeft: 8 }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={<Icon name="info" size="sm" />}
+              onPress={onInfo}
+              disabled={state === 'disabled'}
+              testID={`${testID}-info-button`}
+            >
+              Info
+            </Button>
+          </View>
         )}
-        
+
         {onPreview && (
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<Icon name="play" size="sm" />}
-            onPress={onPreview}
-            disabled={state === 'disabled'}
-            testID={`${testID}-preview-button`}
-          >
-            Preview
-          </Button>
+          <View style={{ marginLeft: 8 }}>
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<Icon name="play" size="sm" />}
+              onPress={onPreview}
+              disabled={state === 'disabled'}
+              testID={`${testID}-preview-button`}
+            >
+              Preview
+            </Button>
+          </View>
         )}
-        
+
         {onRemove && (
-          <Button
-            variant="ghost"
-            size="sm"
-            leftIcon={<Icon name="close" size="sm" />}
-            onPress={onRemove}
-            disabled={state === 'disabled' || state === 'processing'}
-            testID={`${testID}-remove-button`}
-          >
-            Remove
-          </Button>
+          <View style={{ marginLeft: 8 }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={<Icon name="close" size="sm" />}
+              onPress={onRemove}
+              disabled={state === 'disabled' || state === 'processing'}
+              testID={`${testID}-remove-button`}
+            >
+              Remove
+            </Button>
+          </View>
         )}
       </View>
     );

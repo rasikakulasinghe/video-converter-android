@@ -45,9 +45,11 @@ class ErrorLoggerService {
       message,
       error,
       severity,
-      context: {
+      context: metadata ? {
         component,
         metadata,
+      } : {
+        component,
       },
       timestamp: new Date(),
     };

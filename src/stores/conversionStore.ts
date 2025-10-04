@@ -337,31 +337,27 @@ export const useConversionStore = create<ConversionStore>()(
             averageFps: 0, // Extended field for UI
           },
           startTime: finalSession.createdAt,
-          ...(finalSession.completedAt ? { endTime: finalSession.completedAt } : {}),
-          ...(finalSession.result?.outputFile ? { outputFile: finalSession.result.outputFile } : {}),
-          ...(finalSession.error ? {
-            error: {
-              code: finalSession.error.code,
-              message: finalSession.error.message,
-              severity: ErrorSeverity.CRITICAL,
-              timestamp: new Date(),
-              ...(finalSession.error.details && { stack: finalSession.error.details }),
-            }
-          } : {}),
-          ...(finalSession.result?.compressionRatio && finalSession.completedAt && finalSession.result?.processingTime ? {
-            stats: {
-              compressionRatio: finalSession.result.compressionRatio,
-              processingDuration: finalSession.result.processingTime * 1000, // Convert to ms
-              averageSpeed: finalSession.progress.totalDuration / (finalSession.result.processingTime * 1000),
-            }
-          } : {}),
+          endTime: finalSession.completedAt,
+          outputFile: finalSession.result?.outputFile,
+          error: finalSession.error ? {
+            code: finalSession.error.code,
+            message: finalSession.error.message,
+            severity: ErrorSeverity.CRITICAL,
+            timestamp: new Date(),
+            stack: finalSession.error.details ? String(finalSession.error.details) : undefined,
+          } : undefined,
+          stats: (finalSession.result?.compressionRatio && finalSession.completedAt && finalSession.result?.processingTime) ? {
+            compressionRatio: finalSession.result.compressionRatio,
+            processingDuration: finalSession.result.processingTime * 1000, // Convert to ms
+            averageSpeed: finalSession.progress.totalDuration / (finalSession.result.processingTime * 1000),
+          } : undefined,
         };
 
         // Handle successful completion
         const completedJob: ConversionJob = {
           ...job,
           status: 'completed',
-          result: finalSession.result,
+          result: finalSession.result || undefined,
           endTime: new Date(),
           progress: { ...job.progress, percentage: 100 },
         };

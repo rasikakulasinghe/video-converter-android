@@ -24,6 +24,7 @@ export class FileManagerFactory {
         // This prevents react-native-fs from being imported on web
         const { ReactNativeFileManager } = require('./implementations/ReactNativeFileManager');
         this.instance = new ReactNativeFileManager();
+        return this.instance;
       } else if (Platform.OS === 'web') {
         // Use mock file manager for web (no native file system access)
         this.instance = new MockFileManager();
@@ -33,6 +34,7 @@ export class FileManagerFactory {
           new Error('Platform not supported'),
           ErrorSeverity.MEDIUM
         );
+        return this.instance;
       } else {
         // Unknown platform fallback
         this.instance = new MockFileManager();
@@ -42,9 +44,8 @@ export class FileManagerFactory {
           new Error('Unknown platform'),
           ErrorSeverity.HIGH
         );
+        return this.instance;
       }
-
-      return this.instance;
     } catch (error) {
       ErrorLogger.logCritical('FileManagerFactory', 'Failed to initialize file manager', error);
 

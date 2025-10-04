@@ -5,7 +5,7 @@
  * Following constitutional requirements for TypeScript excellence and interfaces
  */
 
-import { VideoFormat, OutputFormat } from './index';
+import { VideoFormat, OutputFormat } from './enums';
 
 /**
  * Output quality levels for video conversion
