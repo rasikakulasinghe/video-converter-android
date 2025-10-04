@@ -244,13 +244,13 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
               {formatFileSize(videoFile.size)}
             </Text>
             <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>
-              {"•"}
+              •
             </Text>
             <Text variant="caption" color="muted" testID={`${testID}-duration`}>
               {formatDuration(videoFile.duration)}
             </Text>
             <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>
-              {"•"}
+              •
             </Text>
             <Text variant="caption" color="muted" testID={`${testID}-resolution`}>
               {videoFile.resolution}
@@ -329,7 +329,7 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
                       {typeof progress.speed === 'number' ? `${progress.speed.toFixed(1)}x` : progress.speed}
                     </Text>
                     <Text variant="caption" color="muted" style={{ marginHorizontal: 8 }}>
-                      {"•"}
+                      •
                     </Text>
                   </>
                 )}
@@ -358,11 +358,10 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
       )}
 
       {/* Action buttons */}
-      <View 
+      <View
         style={{
           flexDirection: 'row',
           justifyContent: 'flex-end',
-          gap: 8,
         }}
       >
         {/* Cancel button (shown during conversion) */}
@@ -372,6 +371,7 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
             size="sm"
             onPress={onCancel}
             testID={`${testID}-cancel-button`}
+            style={{ marginLeft: 8 }}
           >
             Cancel
           </Button>
@@ -384,6 +384,7 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
             size="sm"
             onPress={onRetry}
             testID={`${testID}-retry-button`}
+            style={{ marginLeft: 8 }}
           >
             Retry
           </Button>
@@ -396,6 +397,7 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
             size="sm"
             onPress={onViewResult}
             testID={`${testID}-view-result-button`}
+            style={{ marginLeft: 8 }}
           >
             View Result
           </Button>
@@ -408,6 +410,7 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({
             size="md"
             onPress={onStartConversion}
             testID={`${testID}-start-button`}
+            style={{ marginLeft: 8 }}
           >
             Start Conversion
           </Button>

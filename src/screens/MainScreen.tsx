@@ -114,7 +114,9 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
     }
 
     proceedWithConversion(settings);
-  }, [selectedFiles, batteryLevel]);  const proceedWithConversion = useCallback(async (settings: ConversionSettings) => {
+  }, [selectedFiles, batteryLevel]);
+
+  const proceedWithConversion = useCallback(async (settings: ConversionSettings) => {
     try {
       // Process the first file for now (single file conversion)
       if (selectedVideoFiles.length === 0) return;
@@ -206,7 +208,7 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
       return (
         <View style={styles.warningContainer}>
           <Text style={styles.warningTextDanger}>
-            ⚠️ Device is overheating. Please let it cool down before converting.
+            Device is overheating. Please let it cool down before converting.
           </Text>
         </View>
       );
@@ -216,7 +218,7 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
       return (
         <View style={styles.cautionContainer}>
           <Text style={styles.warningTextCaution}>
-            ⚠️ Low storage space. Consider freeing up space before converting.
+            Low storage space. Consider freeing up space before converting.
           </Text>
         </View>
       );
@@ -237,7 +239,7 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
             onPress={handleOpenSettings}
             style={styles.settingsButton}
           >
-            <Text style={styles.settingsIcon}>⚙️</Text>
+            <Text style={styles.settingsIcon}>Settings</Text>
           </Pressable>
         </View>
         <Text style={styles.headerSubtitle}>
@@ -291,9 +293,11 @@ export const MainScreen: React.FC<MainScreenProps> = () => {
 
           {selectedFiles.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyIcon}>📹</Text>
+              <Text style={styles.emptyIcon}>Video</Text>
               <Text style={styles.emptyText}>
-                No videos selected{'\n'}
+                No videos selected
+              </Text>
+              <Text style={styles.emptyText}>
                 Tap the button below to get started
               </Text>
               <Button
@@ -488,8 +492,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyIcon: {
-    fontSize: 64,
-    marginBottom: 16,
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: '#9ca3af',
+    marginBottom: 8,
   },
   emptyText: {
     color: '#6b7280',

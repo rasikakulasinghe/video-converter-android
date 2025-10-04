@@ -46,7 +46,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = () => {
             onPress={handleGoBack}
             style={styles.backButton}
           >
-            <Text style={styles.backIcon}>←</Text>
+            <Text style={styles.backIcon}>Back</Text>
           </Pressable>
           <Text style={styles.headerTitle}>
             Results
@@ -91,9 +91,11 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = () => {
           
           {processedFiles.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyIcon}>🎬</Text>
+              <Text style={styles.emptyIcon}>Video</Text>
               <Text style={styles.emptyText}>
-                No processed videos yet{'\n'}
+                No processed videos yet
+              </Text>
+              <Text style={styles.emptyText}>
                 Convert some videos to see them here
               </Text>
             </View>
@@ -227,8 +229,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyIcon: {
-    fontSize: 48,
-    marginBottom: 16,
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: '#9ca3af',
+    marginBottom: 8,
   },
   emptyText: {
     color: '#6b7280',

@@ -182,7 +182,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
             onPress={handleGoBack}
             style={styles.backButton}
           >
-            <Text style={styles.backIcon}>←</Text>
+            <Text style={styles.backIcon}>Back</Text>
           </Pressable>
           <Text style={styles.headerTitle}>
             Settings

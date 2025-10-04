@@ -85,7 +85,7 @@ export const ConversionForm: React.FC<ConversionFormProps> = ({
                 <Text
                   style={
                     settings.quality === quality
-                      ? [styles.optionButtonText, styles.optionButtonTextActive]
+                      ? {...styles.optionButtonText, ...styles.optionButtonTextActive}
                       : styles.optionButtonText
                   }
                 >
@@ -113,7 +113,7 @@ export const ConversionForm: React.FC<ConversionFormProps> = ({
                 <Text
                   style={
                     settings.outputFormat === format
-                      ? [styles.optionButtonText, styles.optionButtonTextActive]
+                      ? {...styles.optionButtonText, ...styles.optionButtonTextActive}
                       : styles.optionButtonText
                   }
                 >
@@ -141,7 +141,7 @@ export const ConversionForm: React.FC<ConversionFormProps> = ({
                 <Text
                   style={
                     settings.compression === compression
-                      ? [styles.optionButtonText, styles.optionButtonTextActive]
+                      ? {...styles.optionButtonText, ...styles.optionButtonTextActive}
                       : styles.optionButtonText
                   }
                 >
